@@ -1,0 +1,21 @@
+{
+  "name": "rewards",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "botkit": "^0.6.7"
+  },
+  "devDependencies": {
+    "nodemon": "^1.14.11"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "ssh://git@git.enroutesystems.com:2222/roier/enroute-rewards.git"
+  },
+  "author": "",
+  "license": "ISC"
+}

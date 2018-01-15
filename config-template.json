@@ -1,0 +1,21 @@
+{
+    "firebase": {
+      "apiKey": "",
+      "authDomain": "",
+      "databaseURL": "",
+      "projectId": "",
+      "storageBucket": "",
+      "messagingSenderId": ""
+    },
+    "slack": {
+      "bot": {
+        "token": ""
+      },
+      "client_id": "",
+      "clientID": "",
+      "client_secret": "",
+      "clientSecret": "",
+      "callbackURL": "",
+      "redirect_uri": ""
+    }
+}
