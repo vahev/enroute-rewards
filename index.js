@@ -60,7 +60,7 @@ cron.schedule('59 23 * * ' + config.schedule.days, function() {
 //
 // });
 
-// Listener for channel messages
+// Listener for TOKEN channel messages
 controller.hears(':taco:', 'ambient', function(bot, message) {
 
   var mentioned_users = message.text.match(regex_mention);
@@ -94,6 +94,39 @@ controller.hears(':taco:', 'ambient', function(bot, message) {
     });
 
   }
+
+});
+
+// Listener for LEADERBOARD channerl messages
+controller.hears('show', 'direct_message', function(bot,message) {
+
+  var users = [];
+  var leaderboard = [];
+  var lmessage = '';
+
+  db.getUsers().then(function(snapshot) {
+
+    users = Object.keys(snapshot.val());
+
+    for (user in users) {
+      leaderboard.push([users[user], snapshot.child(users[user]).child('total_coins').val()]);
+    }
+
+    leaderboard.sort(function(a, b) {
+      return b[1] - a[1];
+    });
+
+    // Modify to get only 5 when going live
+    // for (i=0; i<5; i++) {
+    for (i=0; i<leaderboard.length; i++) {
+
+      lmessage = lmessage.concat('<@' + leaderboard[i][0] + '> : ' + leaderboard[i][1] + ' coins \n');
+
+    }
+
+    bot.reply(message, '=====Leaderboard===== \n ' + lmessage);
+
+  });
 
 });
 

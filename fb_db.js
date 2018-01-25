@@ -109,6 +109,12 @@ function getCurrentCoins(from_user) {
 
 }
 
+function getUsers() {
+
+  return firebase.database().ref('users/').once('value');
+
+}
+
 function resetCoins() {
 
   firebase.database().ref('users/').once('value', function(snapshot) {
@@ -126,5 +132,6 @@ function resetCoins() {
 module.exports = {
   processExchange,
   getCurrentCoins,
+  getUsers,
   resetCoins
 }
