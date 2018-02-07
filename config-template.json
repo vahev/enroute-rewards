@@ -17,5 +17,11 @@
       "clientSecret": "",
       "callbackURL": "",
       "redirect_uri": ""
+    },
+    "schedule": {
+      "days": ""
+    },
+    "bot_params": {
+      "keyword": ""
     }
 }
