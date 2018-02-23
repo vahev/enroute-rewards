@@ -1,120 +1,113 @@
-var Botkit = require('botkit');
-var configuration = {
-  debug: false
-};
-var controller = Botkit.slackbot(configuration);
-var config = require('./config');
+/*--------------------------------------------------------------
+Init
+--------------------------------------------------------------*/
+var Botkit = require('botkit'),
+    cron   = require('node-cron'),
+    config = require('./config'),
+    db     = require('./firebase_db'),
+    controller = Botkit.slackbot({
+      debug: false
+    });
 
-var cron = require('node-cron');
-var db = require('./fb_db');
+/*--------------------------------------------------------------
+Token
+--------------------------------------------------------------*/
+const token = config.bot_params.keyword,
+      regex_token = new RegExp(token, "g"),
+      regex_mention = new RegExp('<@.*>', "g");
 
-// Define the token
-const token = config.bot_params.keyword;
-const regex_token = new RegExp(config.bot_params.keyword, "g");
-const regex_mention = new RegExp('<@.*>', "g");
-
-// Setup CRON to reset coins
+/*--------------------------------------------------------------
+Cron
+--------------------------------------------------------------*/
 cron.schedule('59 23 * * ' + config.schedule.days, function() {
   db.resetCoins();
 });
 
-// Listener for TOKEN channel messages
+/*--------------------------------------------------------------
+Token Listener
+--------------------------------------------------------------*/
 controller.hears(':taco:', 'ambient', function(bot, message) {
+  var mentioned_users = message.text.match(regex_mention),
+      coins = message.text.match(regex_token).length,
+      mention_user = mentioned_users[0].split(' ')[0],
+      mention_id = mention_user.replace(/<|@|>/g, '');
 
-  var mentioned_users = message.text.match(regex_mention);
-  var coins = message.text.match(regex_token).length;
+  if (mentioned_users.length != 0
+      && coins != 0
+      && message.user != mention_id) {
 
-  var mention_user = mentioned_users[0].split(' ')[0];
-  var mention_id = mentioned_users[0].split(' ')[0].replace(/<|@|>/g, '');
+    db.getCurrentCoins(message.user)
+        .then(function(snapshot) {
 
-  if (mentioned_users.length !=0 && coins !=0 && message.user != mention_id) {
+        if (snapshot.val() < coins) {
+          bot.reply(message, 'No tienes suficientes tokens prro');
+        } else {
 
-    db.getCurrentCoins(message.user).then(function(snapshot) {
+          bot.startPrivateConversation({ user: message.user },
+            function(response, convo) {
+              convo.say('You sent ' + coins + ' coins to ' + mention_user);
+            });
 
-      if (snapshot.val() < coins) {
-        bot.reply(message, 'No tienes suficientes tokens prro');
-      } else {
-
-        bot.startPrivateConversation({ user: message.user }, function(response, convo) {
-          convo.say('You sent ' + coins + ' coins to ' + mention_user);
-        });
-
-        bot.startPrivateConversation({ user: mention_id }, function(response, convo) {
-          convo.say('You received ' + coins + ' coins from <@' + message.user + '>');
-        });
-
-      }
-
-    }).then(function() {
-
-      db.processExchange(message.user, mention_id, coins);
-
-    });
-
+          bot.startPrivateConversation({ user: mention_id },
+            function(response, convo) {
+              convo.say('You received ' + coins + ' coins from <@' + message.user + '>');
+            });
+        }
+      })
+      .then(function() {
+        db.processExchange(message.user, mention_id, coins);
+      });
   }
-
 });
 
-// Listener for LEADERBOARD channerl messages
-controller.hears('show leaderboard', 'ambient', function(bot,message) {
+/*--------------------------------------------------------------
+Dashboard Listener
+--------------------------------------------------------------*/
+controller.hears('show leaderboard', 'ambient', function(bot, message) {
+  var users = [], leaderboard = [], lmessage = '';
 
-  var users = [];
-  var leaderboard = [];
-  var lmessage = '';
+  db.getUsers()
+    .then(function(snapshot) {
+      users = Object.keys(snapshot.val());
 
-  db.getUsers().then(function(snapshot) {
+      for (user in users) {
+        leaderboard.push([users[user], snapshot.child(users[user]).child('total_coins').val()]);
+      }
+      leaderboard.sort(function(a, b) {
+        return b[1] - a[1];
+      });
 
-    users = Object.keys(snapshot.val());
-
-    for (user in users) {
-      leaderboard.push([users[user], snapshot.child(users[user]).child('total_coins').val()]);
-    }
-
-    leaderboard.sort(function(a, b) {
-      return b[1] - a[1];
+      // Modify to get only 5 when going live
+      // for (i=0; i<5; i++) {
+      for (i=0; i<leaderboard.length; i++) {
+        lmessage = lmessage.concat('<@' + leaderboard[i][0] + '> : ' + leaderboard[i][1] + ' coins \n');
+      }
+      bot.reply(message, '=====Leaderboard===== \n ' + lmessage);
     });
 
-    // Modify to get only 5 when going live
-    // for (i=0; i<5; i++) {
-    for (i=0; i<leaderboard.length; i++) {
-
-      lmessage = lmessage.concat('<@' + leaderboard[i][0] + '> : ' + leaderboard[i][1] + ' coins \n');
-
-    }
-
-    bot.reply(message, '=====Leaderboard===== \n ' + lmessage);
-
-  });
-
 });
 
+/*--------------------------------------------------------------
+Log every message received
+--------------------------------------------------------------*/
 controller.middleware.receive.use(function(bot, message, next) {
-
-  // log it
   console.log('RECEIVED: ', message);
-
-  // modify the message
   message.logged = true;
-
-  // continue processing the message
   next();
-
 });
 
-// Log every message sent
+/*--------------------------------------------------------------
+Log every message sent
+--------------------------------------------------------------*/
 controller.middleware.send.use(function(bot, message, next) {
-
-  // log it
   console.log('SENT: ', message);
-
-  // modify the message
   message.logged = true;
-
-  // continue processing the message
   next();
-
 });
 
+/*--------------------------------------------------------------
+Bot starts
+--------------------------------------------------------------*/
 var bot = controller.spawn({
   token: config.slack.bot.token
 }).startRTM();
