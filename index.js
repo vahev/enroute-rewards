@@ -40,7 +40,10 @@ controller.hears(':taco:', 'ambient', function(bot, message) {
         .then(function(snapshot) {
 
         if (snapshot.val() < coins) {
-          bot.reply(message, 'No tienes suficientes tokens prro');
+          bot.startPrivateConversation({ user: message.user },
+            function(response, convo) {
+              convo.say('I\'m sorry but you dont\'t have enough coins.');
+            });
         } else {
 
           bot.startPrivateConversation({ user: message.user },

@@ -20,6 +20,7 @@ function processExchange(from_user, to_user, coin_quantity) {
       }
     })
     .then(function() {
+      // Creating a new user
       if (!to_user_valid) {
         firebase.database().ref('users/' + to_user).set({
           coins: 5,
@@ -86,8 +87,44 @@ function processExchange(from_user, to_user, coin_quantity) {
   });
 }
 
+function getUser(user) {
+  user_valid = false;
+  return new Promise(function(resolve, reject) {
+    firebase.database().ref('users/' + user)
+      .once('value', function(snapshot) {
+        user_valid = (snapshot.val() === null);
+      })
+      .then(function() {
+        // Creating a new user
+        if (!user_valid) {
+          firebase.database().ref('users/' + user)
+            .set({
+              coins: 5,
+              total_coins: 0
+            })
+            .then(function (
+              resolve();
+            ));
+        } else {
+          resolve();
+        }
+      });
+  });
+}
+
 function getCurrentCoins(from_user) {
-  return firebase.database().ref('users/' + from_user + '/coins').once('value');
+  return new Promise(function(resolve, reject) {
+    getUser(from_user)
+      .then(function() {
+        firebase.database().ref('users/' + from_user + '/coins')
+          .once('value', function(snapshot) {
+            resolve(snapshot);
+          })
+          .catch(function (error) {
+            reject(error);
+          });
+      });
+  });
 }
 
 function getUsers() {
