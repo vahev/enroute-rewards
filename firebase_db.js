@@ -102,9 +102,9 @@ function getUser(user) {
               coins: 5,
               total_coins: 0
             })
-            .then(function (
+            .then(function() {
               resolve();
-            ));
+            });
         } else {
           resolve();
         }
