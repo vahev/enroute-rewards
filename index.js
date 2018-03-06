@@ -14,7 +14,7 @@ Token
 --------------------------------------------------------------*/
 const token = config.bot_params.keyword,
       regex_token = new RegExp(token, "g"),
-      regex_mention = new RegExp('<@.*>', "g");
+      regex_mention = /\<\@(\S+)\>/g;
 
 /*--------------------------------------------------------------
 Cron
@@ -23,42 +23,75 @@ cron.schedule('59 23 * * ' + config.schedule.days, function() {
   db.resetCoins();
 });
 
+function tokenPlural(quantity) {
+  return 'token' + ((quantity != 1) ? 's' : '');
+}
+
+function usersArray(ids) {
+  return ids.slice(0, -1).map(function(receiverId) {
+    return '<@'+receiverId+'>';
+  }).join(', ') + 'and ' + '<@'+ids.slice(-1)[0]+'>';
+}
+
 /*--------------------------------------------------------------
 Token Listener
 --------------------------------------------------------------*/
-controller.hears(':taco:', 'ambient', function(bot, message) {
-  var mentioned_users = message.text.match(regex_mention),
-      coins = message.text.match(regex_token).length,
-      mention_user = mentioned_users[0].split(' ')[0],
-      mention_id = mention_user.replace(/<|@|>/g, '');
+controller.hears(token, 'ambient', function(bot, message) {
+  var mentioned_users = message.text.match(regex_mention);
+  if (mentioned_users.length <= 0) {
+    console.log('There are no users mentioned.');
+    return;
+  }
 
-  if (mentioned_users.length != 0
-      && coins != 0
-      && message.user != mention_id) {
+  var tokens = message.text.match(regex_token).length;
+  if (tokens <= 0) {
+    console.log('There are no tokens in the message.');
+    return;
+  }
 
-    db.getCurrentCoins(message.user)
-        .then(function(snapshot) {
+  mentioned_users = mentioned_users.map(function(mention_user) {
+    return mention_user.trim().replace(/<|@|>/g, '');
+  });
 
-        if (snapshot.val() < coins) {
-          bot.startPrivateConversation({ user: message.user },
-            function(response, convo) {
-              convo.say('I\'m sorry but you dont\'t have enough coins.');
-            });
-        } else {
+  var giverId = message.user,
+      receiversIds = mentioned_users,
+      tokensToSend = (tokens * receiversIds.length),
+      messageLeft = '';
 
-          bot.startPrivateConversation({ user: message.user },
-            function(response, convo) {
-              convo.say('You sent ' + coins + ' coins to ' + mention_user);
-            });
-
-          bot.startPrivateConversation({ user: mention_id },
-            function(response, convo) {
-              convo.say('You received ' + coins + ' coins from <@' + message.user + '>');
-            });
-        }
-      })
-      .then(function() {
-        db.processExchange(message.user, mention_id, coins);
+  if (receiversIds.indexOf(giverId) < 0) {
+    db.getUser(giverId).then(function(user) {
+      var tokensLeft = (user.coins - tokensToSend);
+      if (tokensLeft < 0) {
+        messageLeft = (user.coins === 0) ? ', don\'t have *any* tokens at all. Tomorrow you will have more tokens.' : ', but you only have *' + user.coins + '*.';
+        bot.startPrivateConversation({ user: giverId },
+          function(response, convo) {
+            convo.say('*You don\'t have enough tokens.* You\'re trying to send *' + tokensToSend + '* '+tokenPlural(tokens)+messageLeft);
+          });
+      } else {
+        db.sendTokens(giverId, receiversIds, tokens, function(receiverId) {
+            bot.startPrivateConversation({ user: receiverId }, function(response, convo) {
+                convo.say('You received *'+tokens+'* '+tokenPlural(tokens)+' from <@' + giverId + '>');
+              });
+          })
+          .then(function() {
+            if (receiversIds.length == 1) {
+              messageLeft = (tokensLeft === 0) ? ', that was your last token. Don\'t worry tomorrow you will have more tokens.' : ', now you only have ' + tokensLeft + ' '+tokenPlural(tokensLeft)+' left.';
+              bot.startPrivateConversation({ user: giverId }, function(response, convo) {
+                convo.say('You sent *'+tokens+'* '+tokenPlural(tokens)+' to <@'+receiversIds[0]+'>'+messageLeft);
+              });
+            } else {
+              messageLeft = (tokensLeft === 0) ? ', those were your last tokens. Don\'t worry tomorrow you will have more tokens.' : ', now you only have ' + tokensLeft + ' '+tokenPlural(tokensLeft)+' left.' + (tokensLeft === 1) ? ' Choose wisely.' : '';
+              bot.startPrivateConversation({ user: giverId }, function(response, convo) {
+                convo.say('You sent a total of *' + tokensToSend + '* tokens to ' + usersArray(receiversIds)+messageLeft);
+              });
+            }
+          });
+      }
+    });
+  } else {
+    bot.startPrivateConversation({ user: giverId },
+      function(response, convo) {
+        convo.say('Very funny, but you can\'t send tokens to yourself.');
       });
   }
 });
@@ -74,8 +107,12 @@ controller.hears('show leaderboard', 'ambient', function(bot, message) {
       users = Object.keys(snapshot.val());
 
       for (user in users) {
-        leaderboard.push([users[user], snapshot.child(users[user]).child('total_coins').val()]);
+        var tokens = snapshot.child(users[user]).child('total_coins').val();
+        if (tokens > 0) {
+          leaderboard.push([users[user], tokens]);
+        }
       }
+
       leaderboard.sort(function(a, b) {
         return b[1] - a[1];
       });
@@ -93,8 +130,11 @@ controller.hears('show leaderboard', 'ambient', function(bot, message) {
 /*--------------------------------------------------------------
 Log every message received
 --------------------------------------------------------------*/
+var excludeEvents = ['user_typing'];
 controller.middleware.receive.use(function(bot, message, next) {
-  console.log('RECEIVED: ', message);
+  if (excludeEvents.indexOf(message.type) < 0) {
+    console.log('RECEIVED: ', message);
+  }
   message.logged = true;
   next();
 });

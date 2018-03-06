@@ -1,130 +1,114 @@
 var firebase = require('firebase'),
     config   = require('./config.json');
 
+const default_user = {
+  coins: 5,
+  total_coins: 0
+};
+
 firebase.initializeApp(config.firebase);
 
-function processExchange(from_user, to_user, coin_quantity) {
+function sendTokens(giverId, receiversIds, tokenQuantity, eachTransaction) {
+  var i = 0;
+  return new Promise(function(resolve, reject) {
+    receiversIds.forEach(function(receiverId) {
+      getUser(receiverId).then(function(receiver) {
 
-  var from_user_valid = true,
-      to_user_valid = true,
-      valid_exchange = true;
-
-  var from_user_balance = 0,
-      to_user_balance = 0;
-
-  // TO USER
-  firebase.database().ref('users/' + to_user)
-    .once('value', function(snapshot) {
-      if (snapshot.val() === null) {
-        to_user_valid = false;
-      }
-    })
-    .then(function() {
-      // Creating a new user
-      if (!to_user_valid) {
-        firebase.database().ref('users/' + to_user).set({
-          coins: 5,
-          total_coins: 0
+        getUserTokens(giverId).transaction(function(tokens) {
+          return tokens - tokenQuantity;
         });
-      }
-    });
 
-  // FROM USER
-  firebase.database().ref('users/' + from_user)
-  .once('value', function(snapshot) {
-    if (snapshot.val() === null) {
-      from_user_valid = false;
-    }
-  })
-  .then(function() {
-    if (!from_user_valid) {
-      firebase.database().ref('users/' + from_user)
-        .set({
-          coins: 5,
-          total_coins: 0
+        getUserTotalTokens(receiverId).transaction(function(tokens) {
+          return tokens + tokenQuantity;
         });
-    }
-  })
-  .then(function() {
-    firebase.database().ref('users/' + from_user + '/coins')
-      .once('value', function(snapshot) {
-        if (snapshot.val() < coin_quantity) {
-          valid_exchange = false;
-        } else {
-          from_user_balance = snapshot.val() - coin_quantity;
-        }
-      }).then(function() {
-        if (valid_exchange) {
-          firebase.database().ref('users/' + from_user + '/coins')
-            .set(from_user_balance);
-        }
+
+        var transactions = firebase.database().ref('transactions'),
+            newTransaction = transactions.push();
+
+        newTransaction.set({
+            from: giverId,
+            to: receiverId,
+            quantity: tokenQuantity,
+            date: firebase.database.ServerValue.TIMESTAMP
+          })
+          .then(function() {
+            var newTransactionPath = newTransaction.toString();
+            eachTransaction(receiverId);
+            i++;
+            if (i >= receiversIds.length) {
+              resolve();
+            }
+          });
       });
-  })
-  .then(function() {
-    firebase.database().ref('users/' + to_user + '/total_coins')
-    .once('value', function(snapshot) {
-      if (valid_exchange) {
-        to_user_balance = snapshot.val() + coin_quantity;
-      }
-    })
-    .then(function() {
-      if (valid_exchange) {
-        firebase.database().ref('users/' + to_user + '/total_coins')
-          .set(to_user_balance);
-      }
-    })
-    .then(function() {
-      if (valid_exchange) {
-        var transID = firebase.database().ref().child('transactions').push().key;
-        firebase.database().ref('transactions/' + transID).set({
-          from: from_user,
-          to: to_user,
-          quantity: coin_quantity,
-          date: firebase.database.ServerValue.TIMESTAMP
-        });
-      }
     });
   });
+
+    //   firebase.database().ref('users/' + from_user + '/coins')
+    //     .once('value', function(snapshot) {
+    //       if (snapshot.val() < coin_quantity) {
+    //         valid_exchange = false;
+    //       } else {
+    //         from_user_balance = snapshot.val() - coin_quantity;
+    //       }
+    //     }).then(function() {
+    //       if (valid_exchange) {
+    //         firebase.database().ref('users/' + from_user + '/coins')
+    //           .set(from_user_balance);
+    //       }
+    //     });
+    // })
+    // .then(function() {
+    //   firebase.database().ref('users/' + to_user + '/total_coins')
+    //   .once('value', function(snapshot) {
+    //     if (valid_exchange) {
+    //       to_user_balance = snapshot.val() + coin_quantity;
+    //     }
+    //   })
+    //   .then(function() {
+    //     if (valid_exchange) {
+    //       firebase.database().ref('users/' + to_user + '/total_coins')
+    //         .set(to_user_balance);
+    //     }
+    //   })
+    //   .then(function() {
+    //     if (valid_exchange) {
+    //       var transID = firebase.database().ref().child('transactions').push().key;
+    //       firebase.database().ref('transactions/' + transID).set({
+    //         from: from_user,
+    //         to: to_user,
+    //         quantity: coin_quantity,
+    //         date: firebase.database.ServerValue.TIMESTAMP
+    //       });
+    //     }
+    //   });
+    // });
 }
 
 function getUser(user) {
-  user_valid = false;
+  var ref = firebase.database().ref('users/' + user);
   return new Promise(function(resolve, reject) {
-    firebase.database().ref('users/' + user)
-      .once('value', function(snapshot) {
-        user_valid = (snapshot.val() === null);
-      })
-      .then(function() {
-        // Creating a new user
-        if (!user_valid) {
-          firebase.database().ref('users/' + user)
-            .set({
-              coins: 5,
-              total_coins: 0
-            })
-            .then(function() {
-              resolve();
-            });
-        } else {
-          resolve();
-        }
-      });
+    ref.once('value', function(snapshot) {
+      if (snapshot.val() !== null) {
+        resolve(snapshot.val());
+      } else {
+        ref.set(default_user).then(function (){
+          console.log('User created successfully');
+          resolve(default_user);
+        });
+      }
+    })
+    .catch(function (error) {
+      reject(error);
+    });
   });
 }
 
-function getCurrentCoins(from_user) {
-  return new Promise(function(resolve, reject) {
-    getUser(from_user)
-      .then(function() {
-        firebase.database().ref('users/' + from_user + '/coins')
-          .once('value', function(snapshot) {
-            resolve(snapshot);
-          })
-          .catch(function (error) {
-            reject(error);
-          });
-      });
-  });
+function getUserTokens(user) {
+  return firebase.database().ref('users/' + user + '/coins');
+}
+
+function getUserTotalTokens(user) {
+  return firebase.database().ref('users/' + user + '/total_coins');
 }
 
 function getUsers() {
@@ -135,15 +119,15 @@ function resetCoins() {
   firebase.database().ref('users/').once('value', function(snapshot) {
     var keys = Object.keys(snapshot.val());
     for (i=0; i<keys.length; i++) {
-      firebase.database().ref('users/' + keys[i] + '/coins')
-        .set(5);
+      firebase.database().ref('users/' + keys[i] + '/coins').set(5);
     }
   });
 }
 
 module.exports = {
-  processExchange: processExchange,
-  getCurrentCoins: getCurrentCoins,
+  sendTokens: sendTokens,
+  getUserTokens: getUserTokens,
+  getUser: getUser,
   getUsers: getUsers,
   resetCoins: resetCoins
 }
