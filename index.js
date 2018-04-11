@@ -7,6 +7,9 @@ var Botkit = require('botkit'),
     db     = require('./firebase_db'),
     controller = Botkit.slackbot({
       debug: false
+    }),
+    bot = controller.spawn({
+      token: config.slack.bot.token
     });
 
 /*--------------------------------------------------------------
@@ -130,7 +133,7 @@ controller.hears('show leaderboard', 'ambient', function(bot, message) {
 /*--------------------------------------------------------------
 Log every message received
 --------------------------------------------------------------*/
-var excludeEvents = ['user_typing'];
+var excludeEvents = ['user_typing','bot_added','user_change','reaction_added','file_shared','file_public','dnd_updated_user','self_message','emoji_changed'];
 controller.middleware.receive.use(function(bot, message, next) {
   if (excludeEvents.indexOf(message.type) < 0) {
     console.log('RECEIVED: ', message);
@@ -151,6 +154,16 @@ controller.middleware.send.use(function(bot, message, next) {
 /*--------------------------------------------------------------
 Bot starts
 --------------------------------------------------------------*/
-var bot = controller.spawn({
-  token: config.slack.bot.token
-}).startRTM();
+function start_rtm() {
+  bot.startRTM(function(err,bot,payload) {
+    if (err) {
+      console.log('Failed to start RTM');
+      return setTimeout(start_rtm, 60000);
+    }
+    console.log("RTM started!");
+  });
+}
+controller.on('rtm_close', function(bot, err) {
+  start_rtm();
+});
+start_rtm();

@@ -42,46 +42,6 @@ function sendTokens(giverId, receiversIds, tokenQuantity, eachTransaction) {
       });
     });
   });
-
-    //   firebase.database().ref('users/' + from_user + '/coins')
-    //     .once('value', function(snapshot) {
-    //       if (snapshot.val() < coin_quantity) {
-    //         valid_exchange = false;
-    //       } else {
-    //         from_user_balance = snapshot.val() - coin_quantity;
-    //       }
-    //     }).then(function() {
-    //       if (valid_exchange) {
-    //         firebase.database().ref('users/' + from_user + '/coins')
-    //           .set(from_user_balance);
-    //       }
-    //     });
-    // })
-    // .then(function() {
-    //   firebase.database().ref('users/' + to_user + '/total_coins')
-    //   .once('value', function(snapshot) {
-    //     if (valid_exchange) {
-    //       to_user_balance = snapshot.val() + coin_quantity;
-    //     }
-    //   })
-    //   .then(function() {
-    //     if (valid_exchange) {
-    //       firebase.database().ref('users/' + to_user + '/total_coins')
-    //         .set(to_user_balance);
-    //     }
-    //   })
-    //   .then(function() {
-    //     if (valid_exchange) {
-    //       var transID = firebase.database().ref().child('transactions').push().key;
-    //       firebase.database().ref('transactions/' + transID).set({
-    //         from: from_user,
-    //         to: to_user,
-    //         quantity: coin_quantity,
-    //         date: firebase.database.ServerValue.TIMESTAMP
-    //       });
-    //     }
-    //   });
-    // });
 }
 
 function getUser(user) {
