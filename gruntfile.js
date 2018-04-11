@@ -25,4 +25,21 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-nodemon');
 
   grunt.registerTask('default', ['concurrent:target']);
+  grunt.registerTask('help', function() {
+    grunt.log.subhead('$ grunt');
+    grunt.log.writeln('Run rewards in a local environment.'.blue);
+
+    grunt.log.subhead('$ npm run server:start');
+    grunt.log.writeln('Run rewards in a production environment.'.green);
+
+    grunt.log.subhead('$ npm run server:stop');
+    grunt.log.writeln('Stop rewards in a production environment.'.green);
+
+    grunt.log.subhead('$ npm run server:production');
+    grunt.log.writeln('Start the long-running process in production.'.green);
+
+    grunt.log.subhead('$ npm run server:restart');
+    grunt.log.writeln('Restart the long-running process.'.green);
+
+  });
 };
