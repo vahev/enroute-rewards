@@ -7,9 +7,24 @@ var Botkit = require('botkit'),
     config = require('./config.js'),
     db     = require('./firebase_db'),
     controller = Botkit.slackbot({debug: false}),
-    bot = controller.spawn({
-      token: config.slack.bot.token
-    });
+    bot = controller.spawn({token: config.slack.bot.token}),
+    express = require('express');
+
+/*--------------------------------------------------------------
+Express
+--------------------------------------------------------------*/
+const app = express();
+var routes = require('./routes')(config);
+var port = process.env.PORT || '5000';
+app.set('port', port);
+var server = http.createServer(app);
+server.listen(port);
+server.on('error', function(error){
+  console.error(error);
+});
+server.on('listening', function() {
+  console.log('Rewards start.');
+});
 
 /*--------------------------------------------------------------
 Token
