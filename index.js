@@ -6,12 +6,8 @@ var Botkit = require('botkit'),
     fs     = require('fs'),
     config = null,
     db     = require('./firebase_db'),
-    controller = Botkit.slackbot({
-      debug: false
-    }),
-    bot = controller.spawn({
-      token: config.slack.bot.token
-    });
+    controller = Botkit.slackbot({debug: false}),
+    bot = null;
 
 if (fs.existsSync('/config.json')) {
   config = require('./config');
@@ -20,6 +16,10 @@ if (fs.existsSync('/config.json')) {
 } else {
   console.error('there are no config.json or REWARDS_CONFIG var.');
 }
+
+bot = controller.spawn({
+  token: config.slack.bot.token
+})
 
 /*--------------------------------------------------------------
 Token
