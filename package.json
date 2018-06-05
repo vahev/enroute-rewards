@@ -17,6 +17,7 @@
     "nodemon": "^1.14.11"
   },
   "scripts": {
+    "start": "node index.js",
     "server:start": "node index.js",
     "server:stop": "forever stop index.js",
     "server:production": "forever start index.js --rewards",
