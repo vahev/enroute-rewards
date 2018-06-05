@@ -4,6 +4,7 @@ Init
 var Botkit = require('botkit'),
     cron   = require('node-cron'),
     fs     = require('fs'),
+    http   = require('http'),
     config = require('./config.js'),
     db     = require('./firebase_db'),
     controller = Botkit.slackbot({debug: false}),
@@ -14,7 +15,7 @@ var Botkit = require('botkit'),
 Express
 --------------------------------------------------------------*/
 const app = express();
-var routes = require('./routes')(config);
+var routes = require('./routes')(app, config);
 var port = process.env.PORT || '5000';
 app.set('port', port);
 var server = http.createServer(app);

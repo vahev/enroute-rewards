@@ -8,5 +8,4 @@ module.exports = function (app, config){
     console.log(req.body);
     res.send(':)');
   });
-
-}
+};
