@@ -1,4 +1,5 @@
 var firebase = require('firebase'),
+    fs       = require('fs'),
     config   = null;
 
 if (fs.existsSync('/config.json')) {
