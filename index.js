@@ -3,7 +3,8 @@ Init
 --------------------------------------------------------------*/
 var Botkit = require('botkit'),
     cron   = require('node-cron'),
-    config = require('./config'),
+    fs     = require('fs'),
+    config = null,
     db     = require('./firebase_db'),
     controller = Botkit.slackbot({
       debug: false
@@ -11,6 +12,14 @@ var Botkit = require('botkit'),
     bot = controller.spawn({
       token: config.slack.bot.token
     });
+
+if (fs.existsSync('/config.json')) {
+  config = require('./config');
+} else if(process.env.REWARDS_CONFIG) {
+  config = JSON.parse(process.env.REWARDS_CONFIG);
+} else {
+  console.error('there are no config.json or REWARDS_CONFIG var.');
+}
 
 /*--------------------------------------------------------------
 Token
