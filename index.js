@@ -4,6 +4,7 @@ Init
 var Botkit = require('botkit'),
     cron   = require('node-cron'),
     fs     = require('fs'),
+    https = require('https'),
     http   = require('http'),
     config = require('./config.js'),
     db     = require('./firebase_db'),
@@ -186,5 +187,5 @@ start_rtm();
 Ping
 --------------------------------------------------------------*/
 setInterval(function() {
-  http.get("https://"+config.ping.app_name+".herokuapp.com");
+  https.get("https://"+config.ping.app_name+".herokuapp.com");
 }, config.ping.time);
