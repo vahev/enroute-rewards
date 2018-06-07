@@ -182,3 +182,8 @@ controller.on('rtm_close', function(bot, err) {
   start_rtm();
 });
 start_rtm();
+/*--------------------------------------------------------------
+Ping
+--------------------------------------------------------------*/
+var http = require("http");
+setInterval(function() {http.get("https://"+config.ping.app_name"+.herokuapp.com");}, config.ping.time);
