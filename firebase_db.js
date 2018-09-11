@@ -30,6 +30,7 @@ function sendTokens(giverId, receiversIds, tokenQuantity, eachTransaction) {
             from: giverId,
             to: receiverId,
             quantity: tokenQuantity,
+            type: "tokenGift",
             date: firebase.database.ServerValue.TIMESTAMP
           })
           .then(function() {
