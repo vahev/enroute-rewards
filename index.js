@@ -12,6 +12,7 @@ var Botkit = require('botkit'),
     bot = controller.spawn({token: config.slack.bot.token}),
     express = require('express');
 
+
 /*--------------------------------------------------------------
 Express
 --------------------------------------------------------------*/
@@ -38,10 +39,19 @@ const token = config.bot_params.keyword,
 /*--------------------------------------------------------------
 Invalid Users
 --------------------------------------------------------------*/
-var invalidUsers = [
+let invalidUsers = [
+
   'test_user',
   'USLACKBOT'
 ];
+
+/*--------------------------------------------------------------
+Command list
+--------------------------------------------------------------*/
+let command_list = {
+  'Show leaderboard': 'Displays the taco leaderboard, it can be used on any channel where the bot is invited.',
+  'My coins': 'Displays the actual quantity of coins you have, this command need to be a direct message to the bot.'
+}
 
 /*--------------------------------------------------------------
 Cron
@@ -153,6 +163,31 @@ controller.hears('show leaderboard', 'ambient', function(bot, message) {
       bot.reply(message, '=====Leaderboard===== \n ' + lmessage);
     });
 
+});
+
+
+/*--------------------------------------------------------------
+Personal tokens list
+--------------------------------------------------------------*/
+controller.hears('my coins', 'direct_message', function(bot, message) {
+  db.getUsers(message.user).then(function(snapshot){
+    var coins = snapshot.child(message.user).child('total_coins').val();
+    bot.reply(message, 'You have '+ coins +' coins');
+  });
+});
+
+/*--------------------------------------------------------------
+Display command list
+--------------------------------------------------------------*/
+controller.hears('command list',  'direct_message', function(bot, message) {
+  var command_list_attach = require('./attachments/command_list.json');
+  Object.keys(command_list).forEach(key => {
+    command_list_attach.attachments[0].fields.push({
+      "title": key,
+      "value": command_list[key]
+    });
+  });
+  bot.reply(message, command_list_attach);
 });
 
 /*--------------------------------------------------------------
