@@ -242,9 +242,3 @@ controller.on('rtm_close', function(bot, err) {
   start_rtm();
 });
 start_rtm();
-/*--------------------------------------------------------------
-Ping
---------------------------------------------------------------*/
-setInterval(function() {
-  https.get("https://"+config.ping.app_name+".herokuapp.com");
-}, config.ping.time);
