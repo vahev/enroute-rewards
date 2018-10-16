@@ -1,0 +1,14 @@
+module.exports = function(){
+    return {
+        "attachments": [
+            {
+                "fallback": "Required plain-text summary of the attachment.",
+                "color": "#36a64f",
+                "pretext": "This is the list",
+                "title": "Commands:",
+                "fields": [],
+                "footer": "Slack Bot"
+            }
+        ]
+    }
+}

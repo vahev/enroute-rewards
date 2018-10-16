@@ -40,7 +40,6 @@ const token = config.bot_params.keyword,
 Invalid Users
 --------------------------------------------------------------*/
 let invalidUsers = [
-
   'test_user',
   'USLACKBOT'
 ];
@@ -69,6 +68,21 @@ function usersArray(ids) {
     return '<@'+receiverId+'>';
   }).join(', ') + 'and ' + '<@'+ids.slice(-1)[0]+'>';
 }
+
+/*--------------------------------------------------------------
+Reset Tokens
+--------------------------------------------------------------*/
+
+controller.hears('reset tokens', 'direct_message', function(bot, message) {
+  if(config.admins.includes(message.user)) {
+    db.resetCoins();
+    bot.reply(message, 'tokens has been reset');
+  }
+  else {
+    bot.reply(message, "You don't have permission to do this command");
+  }
+
+});
 
 /*--------------------------------------------------------------
 Token Listener
@@ -179,15 +193,16 @@ controller.hears('my coins', 'direct_message', function(bot, message) {
 /*--------------------------------------------------------------
 Display command list
 --------------------------------------------------------------*/
+var command_list_attach = require('./attachments/command_list.js');
 controller.hears('command list',  'direct_message', function(bot, message) {
-  var command_list_attach = require('./attachments/command_list.json');
+  var attach = new command_list_attach;
   Object.keys(command_list).forEach(key => {
-    command_list_attach.attachments[0].fields.push({
+    attach.attachments[0].fields.push({
       "title": key,
       "value": command_list[key]
     });
   });
-  bot.reply(message, command_list_attach);
+  bot.reply(message, attach);
 });
 
 /*--------------------------------------------------------------
