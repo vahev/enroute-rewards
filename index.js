@@ -60,11 +60,13 @@ cron.schedule('59 23 * * ' + config.schedule.days, function() {
 });
 
 function tokenPlural(quantity) {
+  console.log('token' + ((quantity != 1) ? 's' : '');
   return 'token' + ((quantity != 1) ? 's' : '');
 }
 
 function usersArray(ids) {
   return ids.slice(0, -1).map(function(receiverId) {
+    console.log('<@'+receiverId+'>');
     return '<@'+receiverId+'>';
   }).join(', ') + 'and ' + '<@'+ids.slice(-1)[0]+'>';
 }
@@ -211,7 +213,7 @@ Log every message received
 var excludeEvents = ['user_typing','bot_added','user_change','reaction_added','file_shared','file_public','dnd_updated_user','self_message','emoji_changed'];
 controller.middleware.receive.use(function(bot, message, next) {
   if (excludeEvents.indexOf(message.type) < 0) {
-    console.log('RECEIVED: ', message);
+    //console.log('RECEIVED: ', message);
   }
   message.logged = true;
   next();
@@ -221,7 +223,7 @@ controller.middleware.receive.use(function(bot, message, next) {
 Log every message sent
 --------------------------------------------------------------*/
 controller.middleware.send.use(function(bot, message, next) {
-  console.log('SENT: ', message);
+  //console.log('SENT: ', message);
   message.logged = true;
   next();
 });
