@@ -1,23 +1,25 @@
 module.exports = function(grunt) {
 
   grunt.initConfig({
-    pkg: grunt.file.readJSON('package.json'),
     concurrent: {
       target: {
-        tasks: ['nodemon'],
-        options: {logConcurrentOutput: true}
+        options: {logConcurrentOutput: true},
+        tasks: ['nodemon']
       }
     },
     nodemon: {
       dev: {
-        script: 'index.js',
         options: {
-          callback: function (nodemon) {
-            nodemon.on('log', function(event) {console.log(event.colour);});
+          callback (nodemon) {
+            nodemon.on('log', function(event) {
+              grunt.log.writeln(event.colour);
+            });
           }
-        }
+        },
+        script: 'index.js'
       }
-    }
+    },
+    pkg: grunt.file.readJSON('package.json')
   });
 
   // grunt.loadNpmTasks('grunt-contrib-watch');

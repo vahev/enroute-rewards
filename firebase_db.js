@@ -1,6 +1,5 @@
 var firebase = require('firebase'),
-    fs       = require('fs'),
-    config = require('./config.js');
+		config = require('./config');
 
 const default_user = {
   coins: 5,
