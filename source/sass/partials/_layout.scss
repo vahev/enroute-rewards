@@ -1,0 +1,119 @@
+.container {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+	@include breakpoint(lg) {
+		max-width: $max-width;
+	}
+}
+
+[class^="col-"], [class*=" col-"] {
+	display: flex;
+	flex-direction: column;
+	padding-left: 18px;
+	padding-right: 18px;
+	max-width: 100%;
+	&.col-padding-0 {
+		padding: 0;
+	}
+	&.col-padding-left-0 {
+		padding-left: 0;
+	}
+	&.col-padding-right-0 {
+		margin-right: 0;
+	}
+	&.col-sm--hide {
+		display: none;
+		@include breakpoint(sm) {
+			display: flex;
+		}
+	}
+}
+.col-12 {
+	@extend .flex-1;
+}
+
+@for $c from 1 to ($grid-columns - 1) {
+	.col-#{$c} {
+		width: 100%;
+		@include breakpoint(sm) {
+			width: ($max-width / $grid-columns) * $c;
+		}
+	}
+	.col-offset-#{$c} {
+		margin-left: 0;
+		@include breakpoint(sm) {
+			margin-left: ($max-width / $grid-columns) * $c;
+		}
+	}
+}
+
+.flex {
+	display: flex;
+	&-1 {
+		@extend .flex;
+		flex: 1;
+	}
+	&-row {
+		@extend .flex;
+		flex-direction: row;
+		&-center {
+			@extend .flex-row;
+			align-items: center;
+		}
+		&-align-center {
+			@extend .flex-row;
+			justify-content: center;
+		}
+		&-between {
+			@extend .flex-row;
+			justify-content: space-between;
+		}
+		&-around {
+			@extend .flex-row;
+			justify-content: space-around;
+		}
+		&-sm-around {
+			@extend .flex-row;
+			justify-content: space-around;
+			@include breakpoint(sm) {
+				justify-content: inherit;
+			}
+		}
+		&-sm-between {
+			@extend .flex-row;
+			justify-content: space-between;
+			@include breakpoint(sm) {
+				justify-content: inherit;
+			}
+		}
+		&-sm-col {
+			@extend .flex-row;
+			flex-direction: column;
+			@include breakpoint(sm) {
+				flex-direction: row;
+			}
+		}
+		&-sm-col-reverse {
+			@extend .flex-row;
+			flex-direction: column-reverse;
+			@include breakpoint(sm) {
+				flex-direction: row;
+			}
+		}
+		&-wrap {
+			@extend .flex-row;
+			flex-wrap: wrap;
+		}
+		&-no-padding > [class^="col-"],
+		&-no-padding > [class*=" col-"] {
+			@extend .flex-row;
+			padding: 0;
+		}
+		&-content-box > [class^="col-"],
+		&-content-box > [class*=" col-"] {
+			@extend .flex-row;
+			box-sizing: content-box;
+		}
+	}
+}

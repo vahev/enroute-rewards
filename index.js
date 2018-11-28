@@ -27,7 +27,7 @@ Express
 const app = express();
 app.set('port', PORT);
 app.set('view engine', 'pug');
-
+app.use(express.static('public'));
 
 /*--------------------------------------------------------------
 Routes

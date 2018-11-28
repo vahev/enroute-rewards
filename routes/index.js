@@ -2,9 +2,14 @@ module.exports = function (app, config){
 	app.get('/', (req, res) => {
 		// res.send(config.getAll());
 		res.render('index', {
+			app: {
+				title: 'Enroute Rewards'
+			},
 			config: config.getAll(),
-			message: 'Hello there!',
-			title: 'Hey'
+			view: {
+				title: 'Configuration',
+				url: 'configuration'
+			}
 		});
 	});
 };

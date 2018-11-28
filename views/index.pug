@@ -1,6 +1,7 @@
-html
-	head
-		title= title
-	body
-		h1= message
-		pre= JSON.stringify(config)
+extends layout
+
+block content
+	div.background-grey
+		div.container
+			div.flex-row-sm-col
+				pre.flex-1= JSON.stringify(config, null, 4)
