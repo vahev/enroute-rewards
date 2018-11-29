@@ -1,13 +1,6 @@
-/*--------------------------------------------------------------
-Params
---------------------------------------------------------------*/
-const ENVIRONMENT = process.env.ENVIRONMENT || 'local',
-			PORT = process.env.PORT || '5000',
-			PING = (typeof process.env.PING === "undefined") ? process.env.PING : false;
-
-/*--------------------------------------------------------------
+/*--------
 Init
---------------------------------------------------------------*/
+--------*/
 var util = require('./util'),
 		logger = require('./logger')('index'),
 		Botkit = require('botkit'),
@@ -19,9 +12,9 @@ var util = require('./util'),
 		controller = Botkit.slackbot({debug: false}),
 		express = require('express');
 
-/*--------------------------------------------------------------
+/*--------
 Params
---------------------------------------------------------------*/
+--------*/
 const ENVIRONMENT = config.get('ENVIRONMENT', 'local'),
 			PORT = config.get('PORT', '3000'),
 			PING = config.get('PING', false);
@@ -29,17 +22,17 @@ const ENVIRONMENT = config.get('ENVIRONMENT', 'local'),
 var bot = controller.spawn({token: config.get('slack').bot.token});
 
 
-/*--------------------------------------------------------------
+/*--------
 Express
---------------------------------------------------------------*/
+--------*/
 const app = express();
 app.set('port', PORT);
 app.set('view engine', 'pug');
 app.use(express.static('public'));
 
-/*--------------------------------------------------------------
+/*--------
 Routes
---------------------------------------------------------------*/
+--------*/
 require('./routes')(app, config);
 
 var server = http.createServer(app);
@@ -53,27 +46,27 @@ server.on('listening', () => {
 	logger.info('Server started.');
 });
 
-/*--------------------------------------------------------------
+/*--------
 Token
---------------------------------------------------------------*/
+--------*/
 const { token } = config.get('keyword'),
 			regex_token = new RegExp(token, "g"),
 			regex_mention = /<@(\S+)>/g;
 
 util.setKeyword(config.get('keyword'));
 
-/*--------------------------------------------------------------
+/*--------
 Invalid Users
---------------------------------------------------------------*/
-let invalidUsers = [
+--------*/
+const invalidUsers = [
 	'test_user',
 	'USLACKBOT'
 ];
 
-/*--------------------------------------------------------------
+/*--------
 Command list
---------------------------------------------------------------*/
-let commandList = [
+--------*/
+const commandList = [
 	{
 		message: 'Displays the taco leaderboard, it can be used on any channel where the bot is invited.',
 		name: 'Show Leaderboard'
@@ -84,31 +77,29 @@ let commandList = [
 	}
 ];
 
-/*--------------------------------------------------------------
+/*--------
 Cron
---------------------------------------------------------------*/
+--------*/
 cron.schedule('59 23 * * ' + config.get('schedule').days, function() {
 	db.resetCoins();
 });
 
-/*--------------------------------------------------------------
+/*--------
 Reset Tokens
---------------------------------------------------------------*/
+--------*/
 
 controller.hears('reset tokens', 'direct_message', function(bot, message) {
-  if(config.admins.includes(message.user)) {
-    db.resetCoins();
-    bot.reply(message, 'tokens has been reset');
-  }
-  else {
-    bot.reply(message, "You don't have permission to do this command");
-  }
-
+	if (config.admins.includes(message.user)) {
+		db.resetCoins();
+		bot.reply(message, 'tokens has been reset');
+	} else {
+		bot.reply(message, "You don't have permission to do this command");
+	}
 });
 
-/*--------------------------------------------------------------
+/*--------
 Token Listener
---------------------------------------------------------------*/
+--------*/
 if (util.isProduction(ENVIRONMENT)) {
 	controller.hears(token, 'ambient', function(bot, message) {
 		var mentioned_users = message.text.match(regex_mention);
@@ -169,25 +160,25 @@ if (util.isProduction(ENVIRONMENT)) {
 	});
 }
 
-/*--------------------------------------------------------------
+/*--------
 Dashboard Listener
---------------------------------------------------------------*/
+--------*/
 if (util.isProduction(ENVIRONMENT) || util.isTest(ENVIRONMENT)) {
 	controller.hears('show leaderboard', 'ambient', function(bot, message) {
 		var users = [], leaderboard = [], lmessage = '';
 
 
-  db.getUsers()
-    .then(function(snapshot) {
-      users = Object.keys(snapshot.val());
-      for (user in users) {
-        if( !invalidUsers.includes(users[user]) ) {
-          var tokens = snapshot.child(users[user]).child('total_coins').val();
-          if (tokens > 0) {
-            leaderboard.push([users[user], tokens]);
-          }
-        }
-      }
+		db.getUsers()
+		.then(function(snapshot) {
+			users = Object.keys(snapshot.val());
+			for (const user in users) {
+				if (!invalidUsers.includes(users[user])) {
+					var tokens = snapshot.child(users[user]).child('total_coins').val();
+					if (tokens > 0) {
+						leaderboard.push([users[user], tokens]);
+					}
+				}
+			}
 				leaderboard.sort(function(a, b) {
 					return b[1] - a[1];
 				});
@@ -203,34 +194,34 @@ if (util.isProduction(ENVIRONMENT) || util.isTest(ENVIRONMENT)) {
 }
 
 
-/*--------------------------------------------------------------
+/*--------
 Personal tokens list
---------------------------------------------------------------*/
+--------*/
 controller.hears('my coins', 'direct_message', function(bot, message) {
-  db.getUsers(message.user).then(function(snapshot){
-    var coins = snapshot.child(message.user).child('total_coins').val();
-    bot.reply(message, 'You have '+ coins +' coins');
-  });
+	db.getUsers(message.user).then(function(snapshot){
+		var coins = snapshot.child(message.user).child('total_coins').val();
+		bot.reply(message, 'You have '+ coins +' coins');
+	});
 });
 
-/*--------------------------------------------------------------
+/*--------
 Display command list
---------------------------------------------------------------*/
-var command_list_attach = require('./attachments/command_list.js');
-controller.hears('command list',  'direct_message', function(bot, message) {
-  var attach = new command_list_attach;
-  Object.keys(command_list).forEach(key => {
-    attach.attachments[0].fields.push({
-      "title": key,
-      "value": command_list[key]
-    });
-  });
-  bot.reply(message, attach);
+--------*/
+var CommandListAttach = require('./attachments/command_list.js');
+controller.hears('command list',	'direct_message', function(bot, message) {
+	var attach = new CommandListAttach();
+	Object.keys(commandList).forEach((key) => {
+		attach.attachments[0].fields.push({
+			"title": key,
+			"value": commandList[key]
+		});
+	});
+	bot.reply(message, attach);
 });
 
-/*--------------------------------------------------------------
+/*--------
 Log every message received
---------------------------------------------------------------*/
+--------*/
 // var excludeEvents = ['user_typing','bot_added','user_change','reaction_added','file_shared','file_public','dnd_updated_user','self_message','emoji_changed'];
 // controller.middleware.receive.use(function(bot, message, next) {
 // 	if (excludeEvents.indexOf(message.type) < 0) {
@@ -240,18 +231,18 @@ Log every message received
 // 	next();
 // });
 
-/*--------------------------------------------------------------
+/*--------
 Log every message sent
---------------------------------------------------------------*/
+--------*/
 // controller.middleware.send.use(function(bot, message, next) {
 // 	// console.log('SENT: ', message);
 // 	message.logged = true;
 // 	next();
 // });
 
-/*--------------------------------------------------------------
+/*--------
 Personal tokens list
---------------------------------------------------------------*/
+--------*/
 controller.hears('my coins', 'direct_message', function(bot, message) {
 	db.getUsers(message.user).then(function(snapshot){
 		var coins = snapshot.child(message.user).child('total_coins').val();
@@ -259,9 +250,9 @@ controller.hears('my coins', 'direct_message', function(bot, message) {
 	});
 });
 
-/*--------------------------------------------------------------
+/*--------
 Display command list
---------------------------------------------------------------*/
+--------*/
 // var command_list_attach = require('./attachments/command_list.js');
 //
 // controller.hears('command list', 'direct_message', function(bot, message) {
@@ -275,9 +266,9 @@ Display command list
 // 	bot.reply(message, attach);
 // });
 
-/*--------------------------------------------------------------
+/*--------
 Bot starts
---------------------------------------------------------------*/
+--------*/
 function start_rtm() {
 	bot.startRTM(function(err) {
 		if (err) {
@@ -297,9 +288,9 @@ if (util.isProduction(ENVIRONMENT)) {
 	start_rtm();
 }
 
-/*--------------------------------------------------------------
+/*--------
 Ping
---------------------------------------------------------------*/
+--------*/
 if (PING && util.isProduction(ENVIRONMENT)) {
 	setInterval(() => {
 		https.get("https://"+config.get('ping').app_name+".herokuapp.com");
