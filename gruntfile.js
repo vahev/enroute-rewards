@@ -2,12 +2,35 @@
 
 module.exports = function(grunt) {
 	require('load-grunt-tasks')(grunt);
-
+	let config = null;
+	if (typeof process.env.REWARDS_CONFIG !== 'undefined') {
+		config = JSON.parse(process.env.REWARDS_CONFIG);
+	} else {
+		config = grunt.file.readJSON('config/config.json');
+	}
 	grunt.initConfig({
+		concat: {
+			scripts: {
+				dest: 'public/js/app.js',
+				src: ['source/js/replace/*.js', 'source/js/replace/components/**/*.js']
+			}
+		},
 		concurrent: {
 			dev: {
 				options: {logConcurrentOutput: true},
 				tasks: ['nodemon', 'watch']
+			}
+		},
+		copy: {
+			scripts: {
+				files: [
+					{
+						cwd: 'source/js/app',
+						dest: 'source/js/replace',
+						expand: true,
+						src: ['**']
+					}
+				]
 			}
 		},
 		cssmin: {
@@ -30,6 +53,12 @@ module.exports = function(grunt) {
 						nodemon.on('log', function(event) {
 							grunt.log.writeln(event.colour);
 						});
+						nodemon.on('config:update', function () {
+						// Delay before server listens on port
+							setTimeout(function() {
+								require('open')(config.https + config.host);
+							}, 1000);
+						});
 					},
 					cwd: __dirname,
 					ignore: ['gruntfile.js', 'source/**', 'public/**']
@@ -38,6 +67,19 @@ module.exports = function(grunt) {
 			}
 		},
 		pkg: grunt.file.readJSON('package.json'),
+		replace: {
+			scripts: {
+				overwrite: true,
+				replacements: [
+					{
+						from: /\{host\}/g,
+						to: config.host
+						// to: "<%= grunt.template.today('dd/mm/yyyy') %>"
+					}
+				],
+				src: ['source/js/replace/**/**.js']
+			}
+		},
 		sass: {
 			dist: {
 				files: [
@@ -54,7 +96,9 @@ module.exports = function(grunt) {
 		uglify: {
 			main: {
 				files: {
-					'public/js/main.min.js': ['source/js/**/*.js']
+					'public/js/app.min.js': ['public/js/app.js']
+					// ,
+					// 'public/js/main.min.js': ['source/js/lib/*.js']
 				}
 			}
 		},
@@ -64,7 +108,7 @@ module.exports = function(grunt) {
 				options: {
 					atBegin: true
 				},
-				tasks: ['uglify']
+				tasks: ['copy:scripts', 'replace:scripts', 'concat:scripts', 'uglify']
 			},
 			sass: {
 				files: ['source/sass/**/*.scss'],
@@ -84,6 +128,7 @@ module.exports = function(grunt) {
 
 	grunt.registerTask('default', ['concurrent:dev']);
 	grunt.registerTask('styles', ['sass']);
+	grunt.registerTask('scripts', ['copy:scripts', 'replace:scripts', 'concat:scripts', 'uglify']);
 
 	grunt.registerTask('help', function() {
 		grunt.log.subhead('$ grunt');

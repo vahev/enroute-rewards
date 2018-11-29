@@ -176,7 +176,7 @@ code, kbd, pre, samp {
     .page-title, .home-title {
       font-size: 3.2em; } }
 
-.btn {
+.btn, .btn-blue, .btn-white, .btn-red, .btn-ghost {
   border-radius: 3em;
   display: inline-block;
   font-weight: bold;
@@ -184,8 +184,9 @@ code, kbd, pre, samp {
   padding: .5em 1em;
   margin: .25em 0;
   outline: none;
-  text-align: center; }
-  .btn:focus {
+  text-align: center;
+  cursor: pointer; }
+  .btn:focus, .btn-blue:focus, .btn-white:focus, .btn-red:focus, .btn-ghost:focus {
     outline: none; }
   .btn-blue {
     color: #FFFFFF;
@@ -198,7 +199,9 @@ code, kbd, pre, samp {
   .btn-ghost {
     background-color: transparent;
     border: 1px solid; }
-  .btn-border-radius {
+  .btn-small {
+    font-size: .75em; }
+  .btn.border-radius, .border-radius.btn-blue, .border-radius.btn-white, .border-radius.btn-red, .border-radius.btn-ghost {
     border-radius: .5em; }
 
 .card {
@@ -228,7 +231,7 @@ code, kbd, pre, samp {
     color: #128EFF;
     font-family: "GT Walsheim", sans-serif;
     font-size: 1.5em;
-    line-height: 1.1em;
+    line-height: 1em;
     margin-top: 1em; }
   .card .excerpt {
     margin-top: 1em;
@@ -236,15 +239,20 @@ code, kbd, pre, samp {
     color: #A1A1A1;
     text-overflow: ellipsis;
     overflow: hidden; }
+  .card .btn-edit {
+    font-size: .5em;
+    padding: 0em 1em; }
 
 input[type="text"], textarea {
   color: rgba(0, 0, 0, 0.5);
-  border-width: 2px;
+  border-width: 0 0 2px 0;
   border-style: solid;
   border-color: transparent transparent #128EFF transparent;
   border-radius: 0px;
   margin: .25em 0;
   font-size: 0.85em; }
+  input[type="text"]:focus, textarea:focus {
+    outline: none; }
 
 header#header {
   padding: 24px 10px;
@@ -580,13 +588,14 @@ header#header {
     .flex-row.content-box > [class^="col-"], .content-box.flex-row-center > [class^="col-"], .content-box.flex-row-align-center > [class^="col-"], .content-box.flex-row-between > [class^="col-"], .content-box.flex-row-around > [class^="col-"], .content-box.flex-row-sm-around > [class^="col-"], .content-box.flex-row-sm-between > [class^="col-"], .content-box.flex-row-sm-col > [class^="col-"], .content-box.flex-row-sm-col-reverse > [class^="col-"], .content-box.flex-row-wrap > [class^="col-"], .flex-row.content-box > [class*=" col-"], .content-box.flex-row-center > [class*=" col-"], .content-box.flex-row-align-center > [class*=" col-"], .content-box.flex-row-between > [class*=" col-"], .content-box.flex-row-around > [class*=" col-"], .content-box.flex-row-sm-around > [class*=" col-"], .content-box.flex-row-sm-between > [class*=" col-"], .content-box.flex-row-sm-col > [class*=" col-"], .content-box.flex-row-sm-col-reverse > [class*=" col-"], .content-box.flex-row-wrap > [class*=" col-"] {
       box-sizing: content-box; }
 
+.rewards .input-area + .input-area {
+  margin-top: 1em; }
 .rewards .input-area .name {
-  flex: 1; }
+  flex: 1;
+  text-align: right; }
 .rewards .input-area .input {
   flex: 3; }
 .rewards .input-area textarea {
-  max-height: 10em;
-  min-height: 10em;
-  resize: non; }
+  max-height: 10em; }
 
 /*# sourceMappingURL=styles.css.map */

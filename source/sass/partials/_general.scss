@@ -108,25 +108,33 @@ code, kbd, pre, samp {
 	margin: .25em 0;
 	outline: none;
 	text-align: center;
+	cursor: pointer;
 	&:focus {
 		outline: none;
 	}
 	&-blue {
+		@extend .btn;
 		color: $color-white;
 		background-color: $color-blue;
 	}
 	&-white {
+		@extend .btn;
 		color: $color-white;
 	}
 	&-red {
+		@extend .btn;
 		color: $color-white;
 		background-color: $color-red;
 	}
 	&-ghost {
+		@extend .btn;
 		background-color: transparent;
 		border: 1px solid;
 	}
-	&-border-radius {
+	&-small {
+		font-size: .75em;
+	}
+	&.border-radius {
 		border-radius: .5em;
 	}
 }
@@ -164,7 +172,7 @@ code, kbd, pre, samp {
 		color: $color-blue;
 		font-family: $font-family-walsheim;
 		font-size: 1.5em;
-		line-height: 1.1em;
+		line-height: 1em;
 		margin-top: 1em;
 	}
 	.excerpt {
@@ -174,14 +182,21 @@ code, kbd, pre, samp {
 		text-overflow: ellipsis;
 		overflow: hidden;
 	}
+	.btn-edit {
+		font-size: .5em;
+		padding: 0em 1em;
+	}
 }
 
 input[type="text"], textarea {
 	color: rgba($color-black, .5);
-	border-width: 2px;
+	border-width: 0 0 2px 0;
 	border-style: solid;
 	border-color: transparent transparent $color-blue transparent;
 	border-radius: 0px;
 	margin: .25em 0;
 	font-size: 0.85em;
+	&:focus {
+		outline: none;
+	}
 }

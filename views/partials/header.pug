@@ -7,6 +7,8 @@ header#header
 				span.flex-1
 				div.main-menu--container
 					ul#main-menu.site-menu.flex-row-between.flex-row-sm-col.flex-row-sm-between
+						li.menu-item(class={ 'current-menu-item': view.url == 'leaderboard' })
+							a(href="/leaderboard/") Leaderboard
 						li.menu-item(class={ 'current-menu-item': view.url == 'configuration' })
 							a(href="/") Configuration
 						li.menu-item(class={ 'current-menu-item': view.url == 'about' })
