@@ -1,0 +1,19 @@
+html(ng-app="rewards")
+	head
+		title= app.title
+		link(rel="shortcut icon" type="image/png" href="/favicon.png")
+		include partials/scripts
+		block scripts
+		include partials/styles
+		block styles
+	body
+		include partials/header
+		div#content
+			block header
+				div.content.container
+					div.flex-row-align-center
+						header.col-8
+							h1.page-title.highlight-title
+								span= view.title
+			block content
+		include partials/footer
