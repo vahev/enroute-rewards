@@ -1,13 +1,12 @@
 var firebase = require('firebase'),
-    fs       = require('fs'),
-    config = require('./config.js');
+		config = require('./config');
 
 const default_user = {
   coins: 5,
   total_coins: 0
 };
 
-firebase.initializeApp(config.firebase);
+firebase.initializeApp(config.get('firebase'));
 
 function sendTokens(giverId, receiversIds, tokenQuantity, eachTransaction) {
   var i = 0;
