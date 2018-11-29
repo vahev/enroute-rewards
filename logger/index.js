@@ -9,15 +9,18 @@ winston.format.combine(
 	winston.format.json()
 );
 
-const myFormat = printf((info) => `${info.timestamp} [${info.label}] ${info.level}: ${info.message}`);
+const myFormat = printf((info) => `${info.timestamp} [${info.label.project}] [${info.label.file}] ${info.level}: ${info.message}`);
 
-const logger = createLogger({
+module.exports = (path) => createLogger({
 	format: combine(
-		label({ label: 'rewards' }),
+		label({
+			label: {
+				file: path.split('/').slice(-1)[0],
+				project: 'rewards'
+			}
+		}),
 		timestamp(),
 		myFormat
 	),
 	transports: [new transports.Console()]
 });
-
-module.exports = logger;

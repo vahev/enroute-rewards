@@ -6,7 +6,7 @@ const default_user = {
   total_coins: 0
 };
 
-firebase.initializeApp(config.firebase);
+firebase.initializeApp(config.get('firebase'));
 
 function sendTokens(giverId, receiversIds, tokenQuantity, eachTransaction) {
   var i = 0;

@@ -7,17 +7,30 @@ body {
 }
 
 h1, h2, h3, h4, h5, h6 {
+	margin: 1em 0;
+}
+
+h1, h2, h3, h4, h5, h6, strong {
 	font-family: $font-family-walsheim;
 }
 
 pre {
-	white-space: pre-wrap;
 	font-family: monospace;
-	background-color: $color-gray;
 	display: block;
-	color: $color-white;
-	padding: 6px;
+	padding: 11.5px;
+	margin: 12px 0;
+	font-size: 16px;
+	line-height: 1.42857143;
+	word-break: break-all;
+	word-wrap: break-word;
+	color: $color-dark;
+	background-color: $color-gray-ligther;
+	border: 1px solid $color-gray-ligth;
 	border-radius: 4px;
+}
+
+code, kbd, pre, samp {
+	font-family: Menlo,Monaco,Consolas,"Courier New",monospace;
 }
 
 .highlight-title {
@@ -84,4 +97,91 @@ pre {
 	@include breakpoint(sm) {
 		font-size: 3.2em;
 	}
+}
+
+.btn {
+	border-radius: 3em;
+	display: inline-block;
+	font-weight: bold;
+	text-decoration: none;
+	padding: .5em 1em;
+	margin: .25em 0;
+	outline: none;
+	text-align: center;
+	&:focus {
+		outline: none;
+	}
+	&-blue {
+		color: $color-white;
+		background-color: $color-blue;
+	}
+	&-white {
+		color: $color-white;
+	}
+	&-red {
+		color: $color-white;
+		background-color: $color-red;
+	}
+	&-ghost {
+		background-color: transparent;
+		border: 1px solid;
+	}
+	&-border-radius {
+		border-radius: .5em;
+	}
+}
+
+.card {
+	background-color: $color-white;
+	border-radius: 3px;
+	color: $color-gray;
+	padding: 48px;
+	box-shadow: 0px 40px 80px -40px rgba(0,0,0,.4);
+	margin-bottom: 48px;
+	&-less-padding {
+		padding: 24px;
+		.card--image {
+			margin: -24px -24px 0 -24px;
+		}
+	}
+	&-no-padding {
+		padding: 0px;
+		.card--image {
+			margin: 0;
+		}
+	}
+	&--image {
+		margin: -48px -48px 0 -48px;
+		img {
+			display: block;
+			max-width: 100%;
+			height: 200px;
+			object-fit: cover;
+			border-radius: 3px 3px 0 0;
+		}
+	}
+	h4 {
+		color: $color-blue;
+		font-family: $font-family-walsheim;
+		font-size: 1.5em;
+		line-height: 1.1em;
+		margin-top: 1em;
+	}
+	.excerpt {
+		margin-top: 1em;
+		margin-bottom: 1em;
+		color: $color-gray-ligth;
+		text-overflow: ellipsis;
+		overflow: hidden;
+	}
+}
+
+input[type="text"], textarea {
+	color: rgba($color-black, .5);
+	border-width: 2px;
+	border-style: solid;
+	border-color: transparent transparent $color-blue transparent;
+	border-radius: 0px;
+	margin: .25em 0;
+	font-size: 0.85em;
 }

@@ -1,0 +1,15 @@
+.rewards {
+	.input-area {
+		.name {
+			flex: 1;
+		}
+		.input {
+			flex: 3;
+		}
+		textarea {
+			max-height: 10em;
+			min-height: 10em;
+			resize: non;
+		}
+	}
+}

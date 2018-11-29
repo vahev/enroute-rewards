@@ -2,7 +2,7 @@
 Init
 --------------------------------------------------------------*/
 var util = require('./util'),
-		logger = require('./logger'),
+		logger = require('./logger')('index'),
 		Botkit = require('botkit'),
 		cron	 = require('node-cron'),
 		https	 = require('https'),
@@ -48,9 +48,33 @@ server.on('listening', () => {
 /*--------------------------------------------------------------
 Token
 --------------------------------------------------------------*/
-const token = config.get('bot_params').keyword,
+const { token } = config.get('keyword'),
 			regex_token = new RegExp(token, "g"),
 			regex_mention = /<@(\S+)>/g;
+
+util.setKeyword(config.get('keyword'));
+
+/*--------------------------------------------------------------
+Invalid Users
+--------------------------------------------------------------*/
+let invalidUsers = [
+	'test_user',
+	'USLACKBOT'
+];
+
+/*--------------------------------------------------------------
+Command list
+--------------------------------------------------------------*/
+let commandList = [
+	{
+		message: 'Displays the taco leaderboard, it can be used on any channel where the bot is invited.',
+		name: 'Show Leaderboard'
+	},
+	{
+		message: 'Displays the actual quantity of coins you have, this command need to be a direct message to the bot.',
+		name: 'My coins'
+	}
+];
 
 /*--------------------------------------------------------------
 Cron
@@ -59,15 +83,18 @@ cron.schedule('59 23 * * ' + config.get('schedule').days, function() {
 	db.resetCoins();
 });
 
-function tokenPlural(quantity) {
-	return 'token' + ((quantity != 1) ? 's' : '');
-}
+/*--------------------------------------------------------------
+Reset Tokens
+--------------------------------------------------------------*/
+controller.hears('reset tokens', 'direct_message', function(bot, message) {
+	if (config.admins.includes(message.user)) {
+		db.resetCoins();
+		bot.reply(message, 'tokens has been reset');
+	} else {
+		bot.reply(message, "You don't have permission to do this command");
+	}
 
-function usersArray(ids) {
-	return ids.slice(0, -1).map(function(receiverId) {
-		return '<@'+receiverId+'>';
-	}).join(', ') + 'and ' + '<@'+ids.slice(-1)[0]+'>';
-}
+});
 
 /*--------------------------------------------------------------
 Token Listener
@@ -76,14 +103,12 @@ if (util.isProduction(ENVIRONMENT)) {
 	controller.hears(token, 'ambient', function(bot, message) {
 		var mentioned_users = message.text.match(regex_mention);
 		if (mentioned_users.length <= 0) {
-			// console.log('There are no users mentioned.');
-			return;
+			return logger.warn('There are no users mentioned.');
 		}
 
 		var tokens = message.text.match(regex_token).length;
 		if (tokens <= 0) {
-			// console.log('There are no tokens in the message.');
-			return;
+			return logger.warn('There are no tokens in the message.');
 		}
 
 		mentioned_users = mentioned_users.map(function(mention_user) {
@@ -102,24 +127,24 @@ if (util.isProduction(ENVIRONMENT)) {
 					messageLeft = (user.coins === 0) ? ', don\'t have *any* tokens at all. Tomorrow you will have more tokens.' : ', but you only have *' + user.coins + '*.';
 					bot.startPrivateConversation({ user: giverId },
 						function(response, convo) {
-							convo.say('*You don\'t have enough tokens.* You\'re trying to send *' + tokensToSend + '* '+tokenPlural(tokens)+messageLeft);
+							convo.say('*You don\'t have enough tokens.* You\'re trying to send *' + tokensToSend + '* '+util.tokenHumanize(tokens)+messageLeft);
 						});
 				} else {
 					db.sendTokens(giverId, receiversIds, tokens, function(receiverId) {
 							bot.startPrivateConversation({ user: receiverId }, function(response, convo) {
-									convo.say('You received *'+tokens+'* '+tokenPlural(tokens)+' from <@' + giverId + '>');
+									convo.say('You received *'+tokens+'* '+util.tokenHumanize(tokens)+' from <@' + giverId + '>');
 								});
 						})
 						.then(function() {
 							if (receiversIds.length == 1) {
-								messageLeft = (tokensLeft === 0) ? ', that was your last token. Don\'t worry tomorrow you will have more tokens.' : ', now you only have ' + tokensLeft + ' '+tokenPlural(tokensLeft)+' left.';
+								messageLeft = (tokensLeft === 0) ? ', that was your last token. Don\'t worry tomorrow you will have more tokens.' : ', now you only have ' + tokensLeft + ' '+util.tokenHumanize(tokensLeft)+' left.';
 								bot.startPrivateConversation({ user: giverId }, function(response, convo) {
-									convo.say('You sent *'+tokens+'* '+tokenPlural(tokens)+' to <@'+receiversIds[0]+'>'+messageLeft);
+									convo.say('You sent *'+tokens+'* '+util.tokenHumanize(tokens)+' to <@'+receiversIds[0]+'>'+messageLeft);
 								});
 							} else {
-								messageLeft = (tokensLeft === 0) ? ', those were your last tokens. Don\'t worry tomorrow you will have more tokens.' : ', now you only have ' + tokensLeft + ' '+tokenPlural(tokensLeft)+' left.' + (tokensLeft === 1) ? ' Choose wisely.' : '';
+								messageLeft = (tokensLeft === 0) ? ', those were your last tokens. Don\'t worry tomorrow you will have more tokens.' : ', now you only have ' + tokensLeft + ' '+util.tokenHumanize(tokensLeft)+' left.' + (tokensLeft === 1) ? ' Choose wisely.' : '';
 								bot.startPrivateConversation({ user: giverId }, function(response, convo) {
-									convo.say('You sent a total of *' + tokensToSend + '* tokens to ' + usersArray(receiversIds)+messageLeft);
+									convo.say('You sent a total of *' + tokensToSend + '* tokens to ' + util.usersArray(receiversIds)+messageLeft);
 								});
 							}
 						});
@@ -185,6 +210,32 @@ Log every message sent
 // 	// console.log('SENT: ', message);
 // 	message.logged = true;
 // 	next();
+// });
+
+/*--------------------------------------------------------------
+Personal tokens list
+--------------------------------------------------------------*/
+controller.hears('my coins', 'direct_message', function(bot, message) {
+	db.getUsers(message.user).then(function(snapshot){
+		var coins = snapshot.child(message.user).child('total_coins').val();
+		bot.reply(message, 'You have '+ coins +' coins');
+	});
+});
+
+/*--------------------------------------------------------------
+Display command list
+--------------------------------------------------------------*/
+// var command_list_attach = require('./attachments/command_list.js');
+//
+// controller.hears('command list', 'direct_message', function(bot, message) {
+// 	var attach = new command_list_attach;
+// 	Object.keys(command_list).forEach(key => {
+// 		attach.attachments[0].fields.push({
+// 			"title": key,
+// 			"value": command_list[key]
+// 		});
+// 	});
+// 	bot.reply(message, attach);
 // });
 
 /*--------------------------------------------------------------

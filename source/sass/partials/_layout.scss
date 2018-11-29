@@ -105,14 +105,12 @@
 			@extend .flex-row;
 			flex-wrap: wrap;
 		}
-		&-no-padding > [class^="col-"],
-		&-no-padding > [class*=" col-"] {
-			@extend .flex-row;
+		&.no-padding > [class^="col-"],
+		&.no-padding > [class*=" col-"] {
 			padding: 0;
 		}
-		&-content-box > [class^="col-"],
-		&-content-box > [class*=" col-"] {
-			@extend .flex-row;
+		&.content-box > [class^="col-"],
+		&.content-box > [class*=" col-"] {
 			box-sizing: content-box;
 		}
 	}
