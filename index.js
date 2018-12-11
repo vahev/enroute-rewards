@@ -7,6 +7,7 @@ var util = require('./util'),
 		cron	 = require('node-cron'),
 		https	 = require('https'),
 		http	 = require('http'),
+		request = require('request'),
 		db		 = require('./firebase_db'),
 		config = require('./config'),
 		controller = Botkit.slackbot({debug: false}),
@@ -193,17 +194,6 @@ if (util.isProduction(ENVIRONMENT) || util.isTest(ENVIRONMENT)) {
 	});
 }
 
-
-/*--------
-Personal tokens list
---------*/
-controller.hears('my coins', 'direct_message', function(bot, message) {
-	db.getUsers(message.user).then(function(snapshot){
-		var coins = snapshot.child(message.user).child('total_coins').val();
-		bot.reply(message, 'You have '+ coins +' coins');
-	});
-});
-
 /*--------
 Display command list
 --------*/
@@ -250,6 +240,19 @@ controller.hears('my coins', 'direct_message', function(bot, message) {
 	});
 });
 
+
+function userTimeOffset(user) {
+	request(`https://slack.com/api/users.info?token=${config.get('token')}&user=${user}&locale=true`, function (error, response, body) {
+		if (error) {
+			console.log('error:', error); // Print the error if one occurred
+		}
+		else {
+			console.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received
+			var data = JSON.parse(body).user
+			db.setUserTimeOffset(user, data['tz'], data['tz_offset']);
+		}
+	});
+}
 /*--------
 Display command list
 --------*/
