@@ -1,24 +1,24 @@
 /*--------
 Init
 --------*/
-var util = require('./util'),
-		logger = require('./logger')('index'),
-		Botkit = require('botkit'),
-		cron	 = require('node-cron'),
-		https	 = require('https'),
-		http	 = require('http'),
-		request = require('request'),
-		db		 = require('./firebase_db'),
-		config = require('./config'),
-		controller = Botkit.slackbot({debug: false}),
-		express = require('express');
+var util       = require('./util'),
+	logger     = require('./logger')('index'),
+	Botkit     = require('botkit'),
+	cron	   = require('node-cron'),
+	https	   = require('https'),
+	http	   = require('http'),
+	request    = require('request'),
+	db		   = require('./firebase_db'),
+	config     = require('./config'),
+	controller = Botkit.slackbot({debug: false}),
+	express    = require('express');
 
 /*--------
 Params
 --------*/
 const ENVIRONMENT = config.get('ENVIRONMENT', 'local'),
-			PORT = config.get('PORT', '3000'),
-			PING = config.get('PING', false);
+			PORT  = config.get('PORT', '3000'),
+			PING  = config.get('PING', false);
 
 var bot = controller.spawn({token: config.get('slack').bot.token});
 
@@ -50,10 +50,9 @@ server.on('listening', () => {
 /*--------
 Token
 --------*/
-const { token } = config.get('keyword'),
+const { token, singular, plural } = config.get('keyword'),
 			regex_token = new RegExp(token, "g"),
 			regex_mention = /<@(\S+)>/g;
-
 util.setKeyword(config.get('keyword'));
 
 /*--------
@@ -64,17 +63,18 @@ const invalidUsers = [
 	'USLACKBOT'
 ];
 
+
 /*--------
 Command list
 --------*/
 const commandList = [
 	{
-		message: 'Displays the taco leaderboard, it can be used on any channel where the bot is invited.',
+		message: `Displays the ${singular} leaderboard, it can be used on any channel where the bot is invited.`,
 		name: 'Show Leaderboard'
 	},
 	{
-		message: 'Displays the actual quantity of coins you have, this command need to be a direct message to the bot.',
-		name: 'My coins'
+		message: `Displays the actual quantity of ${plural} you have, this command need to be a direct message to the bot.`,
+		name: `my ${plural} quantity`
 	}
 ];
 
@@ -89,12 +89,12 @@ cron.schedule('59 23 * * ' + config.get('schedule').days, function() {
 Reset Tokens
 --------*/
 
-controller.hears('reset tokens', 'direct_message', function(bot, message) {
+controller.hears(`Reset daily ${plural}`, 'direct_message', function(bot, message) {
 	if (config.admins.includes(message.user)) {
 		db.resetCoins();
-		bot.reply(message, 'tokens has been reset');
+		bot.reply(message, `The ${plural} has been reset.`);
 	} else {
-		bot.reply(message, "You don't have permission to do this command");
+		bot.reply(message, "You don't have permission to do this command.");
 	}
 });
 
@@ -110,7 +110,7 @@ if (util.isProduction(ENVIRONMENT)) {
 
 		var tokens = message.text.match(regex_token).length;
 		if (tokens <= 0) {
-			return logger.warn('There are no tokens in the message.');
+			return logger.warn(`There are no ${plural} in the message.`);
 		}
 
 		mentioned_users = mentioned_users.map(function(mention_user) {
@@ -126,10 +126,10 @@ if (util.isProduction(ENVIRONMENT)) {
 			db.getUser(giverId).then(function(user) {
 				var tokensLeft = (user.coins - tokensToSend);
 				if (tokensLeft < 0) {
-					messageLeft = (user.coins === 0) ? ', don\'t have *any* tokens at all. Tomorrow you will have more tokens.' : ', but you only have *' + user.coins + '*.';
+					messageLeft = (user.coins === 0) ? `, don\'t have *any* ${plural} at all. Tomorrow you will have more ${plural}.` : ', but you only have *' + user.coins + '*.';
 					bot.startPrivateConversation({ user: giverId },
 						function(response, convo) {
-							convo.say('*You don\'t have enough tokens.* You\'re trying to send *' + tokensToSend + '* '+util.tokenHumanize(tokens)+messageLeft);
+							convo.say(`*You don\'t have enough ${plural}.* You\'re trying to send *` + tokensToSend + '* '+util.tokenHumanize(tokens)+messageLeft);
 						});
 				} else {
 					db.sendTokens(giverId, receiversIds, tokens, function(receiverId) {
@@ -139,7 +139,7 @@ if (util.isProduction(ENVIRONMENT)) {
 						})
 						.then(function() {
 							if (receiversIds.length == 1) {
-								messageLeft = (tokensLeft === 0) ? ', that was your last token. Don\'t worry tomorrow you will have more tokens.' : ', now you only have ' + tokensLeft + ' '+util.tokenHumanize(tokensLeft)+' left.';
+								messageLeft = (tokensLeft === 0) ? `, that was your last token. Don\'t worry tomorrow you will have more ${plural}.` : ', now you only have ' + tokensLeft + ' '+util.tokenHumanize(tokensLeft)+' left.';
 								bot.startPrivateConversation({ user: giverId }, function(response, convo) {
 									convo.say('You sent *'+tokens+'* '+util.tokenHumanize(tokens)+' to <@'+receiversIds[0]+'>'+messageLeft);
 								});
@@ -155,7 +155,7 @@ if (util.isProduction(ENVIRONMENT)) {
 		} else {
 			bot.startPrivateConversation({ user: giverId },
 				function(response, convo) {
-					convo.say('Very funny, but you can\'t send tokens to yourself.');
+					convo.say(`Very funny, but you can\'t send ${plural} to yourself.`);
 				});
 		}
 	});
@@ -186,10 +186,10 @@ if (util.isProduction(ENVIRONMENT) || util.isTest(ENVIRONMENT)) {
 
 				// Modify to get only 5 when going live
 				// for (i=0; i<5; i++) {
-				for (var i = 0; i < leaderboard.length; i++) {
-					lmessage = lmessage.concat('<@' + leaderboard[i][0] + '> : ' + leaderboard[i][1] + ' coins \n');
+				for (var i = 0; i < 10; i++) {
+					lmessage = lmessage.concat(`${i+1}. <@${leaderboard[i][0]}> : ${leaderboard[i][1]} ${plural} \n`);
 				}
-				bot.reply(message, '=====Leaderboard===== \n ' + lmessage);
+				bot.reply(message, '=====Top 10===== \n ' + lmessage);
 			});
 	});
 }
@@ -198,12 +198,12 @@ if (util.isProduction(ENVIRONMENT) || util.isTest(ENVIRONMENT)) {
 Display command list
 --------*/
 var CommandListAttach = require('./attachments/command_list.js');
-controller.hears('command list',	'direct_message', function(bot, message) {
+controller.hears('help',	'direct_message', function(bot, message) {
 	var attach = new CommandListAttach();
-	Object.keys(commandList).forEach((key) => {
+	Object.keys(commandList[0]).forEach((key) => {
 		attach.attachments[0].fields.push({
 			"title": key,
-			"value": commandList[key]
+			"value": commandList[0][key]
 		});
 	});
 	bot.reply(message, attach);
@@ -233,10 +233,10 @@ Log every message sent
 /*--------
 Personal tokens list
 --------*/
-controller.hears('my coins', 'direct_message', function(bot, message) {
+controller.hears(`my ${plural} quantity`, 'direct_message', function(bot, message) {
 	db.getUsers(message.user).then(function(snapshot){
 		var coins = snapshot.child(message.user).child('total_coins').val();
-		bot.reply(message, 'You have '+ coins +' coins');
+		bot.reply(message, `You have ${coins} ${plural}`);
 	});
 });
 
@@ -253,21 +253,6 @@ function userTimeOffset(user) {
 		}
 	});
 }
-/*--------
-Display command list
---------*/
-// var command_list_attach = require('./attachments/command_list.js');
-//
-// controller.hears('command list', 'direct_message', function(bot, message) {
-// 	var attach = new command_list_attach;
-// 	Object.keys(command_list).forEach(key => {
-// 		attach.attachments[0].fields.push({
-// 			"title": key,
-// 			"value": command_list[key]
-// 		});
-// 	});
-// 	bot.reply(message, attach);
-// });
 
 /*--------
 Bot starts
