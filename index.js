@@ -10,7 +10,10 @@ var util       = require('./util'),
 	request    = require('request'),
 	db		   = require('./firebase_db'),
 	config     = require('./config'),
-	controller = Botkit.slackbot({debug: false}),
+	controller = Botkit.slackbot({
+					clientSigningSecret: config.get('slack').slackbot.clientSecret,
+					debug: false
+				}),
 	express    = require('express');
 
 /*--------
@@ -56,25 +59,16 @@ const { token, singular, plural } = config.get('keyword'),
 util.setKeyword(config.get('keyword'));
 
 /*--------
-Invalid Users
---------*/
-const invalidUsers = [
-	'test_user',
-	'USLACKBOT'
-];
-
-
-/*--------
 Command list
 --------*/
 const commandList = [
 	{
 		message: `Displays the ${singular} leaderboard, it can be used on any channel where the bot is invited.`,
-		name: 'Show Leaderboard'
+		name: 'show leaderboard'
 	},
 	{
 		message: `Displays the actual quantity of ${plural} you have, this command need to be a direct message to the bot.`,
-		name: `my ${plural} quantity`
+		name: `my ${plural}`
 	}
 ];
 
@@ -89,8 +83,8 @@ cron.schedule('59 23 * * ' + config.get('schedule').days, function() {
 Reset Tokens
 --------*/
 
-controller.hears(`Reset daily ${plural}`, 'direct_message', function(bot, message) {
-	if (config.admins.includes(message.user)) {
+controller.hears(`reset daily ${plural}`, 'direct_message', function(bot, message) {
+	if (config.get('admins').includes(message.user)) {
 		db.resetCoins();
 		bot.reply(message, `The ${plural} has been reset.`);
 	} else {
@@ -184,9 +178,13 @@ if (util.isProduction(ENVIRONMENT) || util.isTest(ENVIRONMENT)) {
 					return b[1] - a[1];
 				});
 
+				var printableUsers = 10;
+				if(leaderboard.length < 10) {
+					printableUsers = leaderboard.length;
+				} 
 				// Modify to get only 5 when going live
 				// for (i=0; i<5; i++) {
-				for (var i = 0; i < 10; i++) {
+				for (var i = 0; i < printableUsers; i++) {
 					lmessage = lmessage.concat(`${i+1}. <@${leaderboard[i][0]}> : ${leaderboard[i][1]} ${plural} \n`);
 				}
 				bot.reply(message, '=====Top 10===== \n ' + lmessage);
@@ -200,10 +198,11 @@ Display command list
 var CommandListAttach = require('./attachments/command_list.js');
 controller.hears('help',	'direct_message', function(bot, message) {
 	var attach = new CommandListAttach();
-	Object.keys(commandList[0]).forEach((key) => {
+	Object.keys(commandList).forEach((index) => {
+		console.log(commandList[index]);
 		attach.attachments[0].fields.push({
-			"title": key,
-			"value": commandList[0][key]
+			"title": commandList[index].name,
+			"value": commandList[index].message
 		});
 	});
 	bot.reply(message, attach);
@@ -233,7 +232,7 @@ Log every message sent
 /*--------
 Personal tokens list
 --------*/
-controller.hears(`my ${plural} quantity`, 'direct_message', function(bot, message) {
+controller.hears(`my ${plural}`, 'direct_message', function(bot, message) {
 	db.getUsers(message.user).then(function(snapshot){
 		var coins = snapshot.child(message.user).child('total_coins').val();
 		bot.reply(message, `You have ${coins} ${plural}`);
