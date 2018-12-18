@@ -24,14 +24,7 @@ const ENVIRONMENT = config.get('ENVIRONMENT', 'local'),
 			PING  = config.get('PING', false);
 
 var bot = controller.spawn({token: config.get('slack').bot.token});
-
-/*--------
-Invalid Users
---------*/
-const invalidUsers = [
-	'test_user',
-	'USLACKBOT'
-];
+var invalidUsers = ['test_user'];
 
 /*--------
 Express
@@ -83,7 +76,11 @@ const commandList = [
 Cron
 --------*/
 cron.schedule('59 23 * * ' + config.get('schedule').days, function() {
+	cleanDeletedUsers();
 	db.resetCoins();
+},{
+	scheduled: true,
+	timezone: config.get('timezone')
 });
 
 /*--------
@@ -189,7 +186,7 @@ if (util.isProduction(ENVIRONMENT) || util.isTest(ENVIRONMENT)) {
 				leaderboard.forEach(function(user, index) {
 					lmessage = lmessage.concat(`${index+1}. <@${user[0]}> : ${user[1]} ${plural} \n`);
 				});
-					
+
 				bot.reply(message, '=====Top 10===== \n ' + lmessage);
 			});
 	});
@@ -242,16 +239,19 @@ controller.hears(`my ${plural}`, 'direct_message', function(bot, message) {
 	});
 });
 
-
-function userTimeOffset(user) {
-	request(`https://slack.com/api/users.info?token=${config.get('token')}&user=${user}&locale=true`, function (error, response, body) {
+function cleanDeletedUsers() {
+	request(`https://slack.com/api/users.list?token=${config.get('token')}&include_locale=true&pretty=1`, function (error, response, body) {
 		if (error) {
 			console.log('error:', error); // Print the error if one occurred
 		}
 		else {
 			console.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received
-			var data = JSON.parse(body).user
-			db.setUserTimeOffset(user, data['tz'], data['tz_offset']);
+			var members = JSON.parse(body).members;
+			members.forEach(function(member) {
+				if(member.deleted) {
+					db.deleteUser(member.id, member.name);
+				}
+			});
 		}
 	});
 }
