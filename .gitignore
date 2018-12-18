@@ -1,5 +1,6 @@
 node_modules/
 package-lock.json
 config.json
+firebase_config.json
 .DS_Store
 .sass-cache/
