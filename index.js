@@ -185,15 +185,13 @@ if (util.isProduction(ENVIRONMENT) || util.isTest(ENVIRONMENT)) {
 					return b[1] - a[1];
 				});
 
-				var printableUsers = 10;
-				if(leaderboard.length < 10) {
-					printableUsers = leaderboard.length;
-				} 
-				// Modify to get only 5 when going live
-				// for (i=0; i<5; i++) {
-				for (var i = 0; i < printableUsers; i++) {
-					lmessage = lmessage.concat(`${i+1}. <@${leaderboard[i][0]}> : ${leaderboard[i][1]} ${plural} \n`);
-				}
+				leaderboard = leaderboard.slice(0,10);
+				var count = 1;
+				leaderboard.forEach(function(user, index) {
+					lmessage = lmessage.concat(`${index+1}. <@${user[0]}> : ${user[1]} ${plural} \n`);
+					count++;
+				});
+					
 				bot.reply(message, '=====Top 10===== \n ' + lmessage);
 			});
 	});
