@@ -25,6 +25,13 @@ const ENVIRONMENT = config.get('ENVIRONMENT', 'local'),
 
 var bot = controller.spawn({token: config.get('slack').bot.token});
 
+/*--------
+Invalid Users
+--------*/
+const invalidUsers = [
+	'test_user',
+	'USLACKBOT'
+];
 
 /*--------
 Express
