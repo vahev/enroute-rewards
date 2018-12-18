@@ -1,15 +1,21 @@
 extends layout
 
 block content
-	div.background-grey
+	section.background-grey(ng-controller="RewardsController")
 		div.content.container
 			div.flex-row-align-center.no-padding
-				div.col-12.rewards
+				div.col-9.rewards
 					div.flex-row
-						div.col.col-12
-							h1 Rewards
+						div.col.flex-1
+							h1 Rewards (
+								span(ng-bind="rewards|length")
+								|)
 					div.flex-row-wrap
-						each reward, index in JSON.parse(JSON.stringify(config.rewards))
+						div.col.col-3(ng-repeat="(key, reward) in rewards")
+							reward-card(reward="reward" key="key" on-remove="fetchRewards()")
+						div.col.col-3
+							reward-card(ng-if="newReward" reward="newReward" is-new="true" on-new="fetchRewards()")
+						//- each reward, index in JSON.parse(JSON.stringify(config.rewards))
 							div.col.col-3
 								div.card.card-less-padding
 									div.card--image
@@ -20,14 +26,18 @@ block content
 											i.edit
 											span Edit
 									div.excerpt
-										p
-											strong Price:&nbsp;
-											span= reward.price + " " + config.local.keyword.plural
-										p
-											strong Detail:&nbsp;
+										p.flex-row.input-area
+											strong.name Price:&nbsp;
+											span.input
+												| "{{"+reward.price+"}}"
+												span(ng-bind="('"+config.local.keyword.token+"'|emojis)")
+										p.flex-row.input-area
+											strong.name Detail:&nbsp;
 											if(reward.detail)
-												span= reward.detail
-						div.col.col-3
+												span.input= reward.detail
+											else
+												textarea.input(name="detail" placeholder="Detail about the reward.")
+						//- div.col.col-3
 							div.card.card-less-padding
 								div.card--image
 									a
@@ -36,17 +46,19 @@ block content
 								div.excerpt
 									p.flex-row.input-area
 										strong.name Price:&nbsp;
-										input.input(type="text" name="price" placeholder="Price in " + config.local.keyword.plural)
+										input.input(type="number" name="price" placeholder="Price in " + config.local.keyword.plural)
 									p.flex-row.input-area
 										strong.name Detail:&nbsp;
 										textarea.input(name="detail" placeholder="Detail about the reward.")
-								a.btn.btn-blue Save
+								div.flex-row-align-end
+									span.flex-1
+									a.btn.btn-blue Save
 								
-			div.flex-row-align-center
+			//- div.flex-row-align-center
 				div.col-8
 					h1 App Config
 					pre= JSON.stringify(config.app, null, 4) 
-			div.flex-row-align-center
+			//- div.flex-row-align-center
 				div.col-8
 					h1 Local Config
 					pre= JSON.stringify(config.local, null, 4)

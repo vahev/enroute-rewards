@@ -1,0 +1,14 @@
+<div ng-if="!uploaded" class="placeholder">
+	<a class="actions" ng-class="{'disabled': !preview}">
+		<i ng-if="!preview" class="icon upload"><img src="/img/icons/cloud-upload.svg"></i>
+		<i ng-if="preview" class="icon cancel" ng-click="cancel()"><img src="/img/icons/cancel.svg"></i>
+	</a>
+	<p ng-if="preview" class="preview-name" ng-bind="previewName"></p>
+	<div ng-if="preview" class="overlay"></div>
+	<img ng-if="preview" class="preview" ng-src="{{previewUrl}}" alt="">
+	<input class="file-input" name="file" type="file" onchange="angular.element(this).scope().processFile(this)">
+</div>
+
+<div ng-if="uploaded" class="uploaded">
+	<img ng-src="{{url}}" alt="">
+</div>

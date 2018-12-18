@@ -1,1 +1,9 @@
-script(src="js/main.min.js")
+if config.local.ENVIRONMENT === "test"
+	script(src="https://www.gstatic.com/firebasejs/5.7.0/firebase.js")
+else
+	script(src="https://www.gstatic.com/firebasejs/5.0.0/firebase-storage.js")
+script(src="/js/lib.min.js")
+if config.local.ENVIRONMENT === "test"
+	script(src="/js/app.js")
+else
+	script(src="/js/app.min.js")

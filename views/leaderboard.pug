@@ -1,0 +1,13 @@
+extends layout
+
+block content
+	section.background-grey(ng-controller="LeaderboardController")
+		div.content.container
+			div.flex-row-align-center.no-padding
+				div.col-9.rewards
+					div.flex-row
+						div.col.flex-1
+							h1 Leaderboard
+					ul.flex-column.leaderboard
+						li(ng-repeat="(key, user) in leaderboard")
+							span(ng-bind="user")

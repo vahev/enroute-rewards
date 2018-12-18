@@ -57,6 +57,9 @@
 	&-row {
 		@extend .flex;
 		flex-direction: row;
+		> * {
+			display: flex;
+		}
 		&-center {
 			@extend .flex-row;
 			align-items: center;
@@ -64,6 +67,10 @@
 		&-align-center {
 			@extend .flex-row;
 			justify-content: center;
+		}
+		&-align-end {
+			@extend .flex-row;
+			justify-content: end;
 		}
 		&-between {
 			@extend .flex-row;

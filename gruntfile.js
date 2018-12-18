@@ -1,4 +1,5 @@
 /*eslint global-require: "off"*/
+/*eslint max-params: "off"*/
 
 module.exports = function(grunt) {
 	require('load-grunt-tasks')(grunt);
@@ -9,7 +10,17 @@ module.exports = function(grunt) {
 		config = grunt.file.readJSON('config/config.json');
 	}
 	grunt.initConfig({
+		clean: {
+			scripts: ['source/js/replace/**']
+		},
 		concat: {
+			lib: {
+				dest: 'public/js/lib.min.js',
+				src: [
+					'bower_components/angular/angular.min.js',
+					'source/js/lib/emoji.min.js'
+				]
+			},
 			scripts: {
 				dest: 'public/js/app.js',
 				src: ['source/js/replace/*.js', 'source/js/replace/components/**/*.js']
@@ -21,12 +32,43 @@ module.exports = function(grunt) {
 				tasks: ['nodemon', 'watch']
 			}
 		},
+		config: grunt.file.readJSON('config/config.json'),
 		copy: {
+			fonts: {
+				files: [
+					{
+						cwd: 'source/fonts',
+						dest: 'public/fonts',
+						expand: true,
+						src: ['**']
+					}
+				]
+			},
+			images: {
+				files: [
+					{
+						cwd: 'source/img',
+						dest: 'public/img',
+						expand: true,
+						src: ['**']
+					}
+				]
+			},
 			scripts: {
 				files: [
 					{
 						cwd: 'source/js/app',
 						dest: 'source/js/replace',
+						expand: true,
+						src: ['**']
+					}
+				]
+			},
+			templates: {
+				files: [
+					{
+						cwd: 'source/js/replace/templates',
+						dest: 'public/templates',
 						expand: true,
 						src: ['**']
 					}
@@ -46,6 +88,9 @@ module.exports = function(grunt) {
 				]
 			}
 		},
+		eslint: {
+			scripts: ['source/js/app/**/*.js']
+		},
 		nodemon: {
 			dev: {
 				options: {
@@ -54,10 +99,9 @@ module.exports = function(grunt) {
 							grunt.log.writeln(event.colour);
 						});
 						nodemon.on('config:update', function () {
-						// Delay before server listens on port
 							setTimeout(function() {
 								require('open')(config.https + config.host);
-							}, 1000);
+							}, 4000);
 						});
 					},
 					cwd: __dirname,
@@ -74,10 +118,31 @@ module.exports = function(grunt) {
 					{
 						from: /\{host\}/g,
 						to: config.host
-						// to: "<%= grunt.template.today('dd/mm/yyyy') %>"
+					},
+					{
+						from: /\{build\}/g,
+						to: "<%= grunt.template.today('dd/mm/yyyy') %>"
+					},
+					{
+						from: /\{config\}/g,
+						to: JSON.stringify(config.public)
+					},
+					{
+						from: /\{firebase_config\}/g,
+						to: JSON.stringify(config.firebase)
 					}
 				],
 				src: ['source/js/replace/**/**.js']
+			},
+			templates: {
+				overwrite: true,
+				replacements: [
+					{
+						from: /<img\ssrc="([^.]+.svg)">/g,
+						to: (matchedWord, index, fullText, regexMatches) => "<%= grunt.file.read('./source/"+regexMatches[0]+"') %>"
+					}
+				],
+				src: ['source/js/replace/templates/*.html']
 			}
 		},
 		sass: {
@@ -94,21 +159,19 @@ module.exports = function(grunt) {
 			}
 		},
 		uglify: {
-			main: {
+			scripts: {
 				files: {
 					'public/js/app.min.js': ['public/js/app.js']
-					// ,
-					// 'public/js/main.min.js': ['source/js/lib/*.js']
 				}
 			}
 		},
 		watch: {
 			js: {
-				files: 'source/js/**/*.js',
+				files: ['source/js/**/*.js', 'source/js/app/templates/*.html'],
 				options: {
 					atBegin: true
 				},
-				tasks: ['copy:scripts', 'replace:scripts', 'concat:scripts', 'uglify']
+				tasks: ['copy:scripts', 'replace:scripts', 'replace:templates', 'copy:templates', 'concat:scripts', 'clean:scripts', 'uglify:scripts']
 			},
 			sass: {
 				files: ['source/sass/**/*.scss'],
@@ -128,7 +191,8 @@ module.exports = function(grunt) {
 
 	grunt.registerTask('default', ['concurrent:dev']);
 	grunt.registerTask('styles', ['sass']);
-	grunt.registerTask('scripts', ['copy:scripts', 'replace:scripts', 'concat:scripts', 'uglify']);
+	grunt.registerTask('scripts', ['eslint:scripts', 'copy:scripts', 'replace:scripts', 'replace:templates', 'copy:templates', 'concat', 'clean:scripts', 'uglify']);
+	grunt.registerTask('build', ['styles', 'scripts', 'copy:images', 'copy:fonts']);
 
 	grunt.registerTask('help', function() {
 		grunt.log.subhead('$ grunt');

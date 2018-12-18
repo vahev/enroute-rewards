@@ -1,0 +1,53 @@
+<div class="card card-less-padding" ng-class="{'updating': updating, 'uploading': uploading}">
+	<div class="card--updating">
+		<div class="overlay"></div>
+		<div class="dots">
+			<div class="dot dot-1"></div><div class="dot dot-2"></div><div class="dot dot-3"></div>
+		</div>
+	</div>
+	<div class="card--image">
+		<upload-file class="full" ng-if="isNew || ((!imageURL && imageLoaded) || updating)" url="reward.image"></upload-file>
+		<storage-image ng-if="imageURL && imageLoaded" url="reward.image"></storage-image>
+	</div>
+	<div class="card--header">
+		<h4 class="flex-row-between">
+			<span class="card--name" ng-if="!updating && reward.name" ng-bind="reward.name"></span>
+			<input ng-if="updating" ng-model="reward.name" class="input" type="text" name="name" placeholder="Name">
+			<a class="btn-ghost btn-small btn-action btn-edit" ng-if="!updating" ng-click="edit()">
+				<i class="icon edit"><img src="/img/icons/edit.svg"></i>
+				<span>Edit</span>
+			</a>
+			<a class="btn-ghost btn-small btn-action btn-cancel" ng-if="updating" ng-click="cancel()">
+				<i class="icon edit"><img src="/img/icons/cancel.svg"></i>
+				<span>Cancel</span>
+			</a>
+		</h4>
+	</div>
+	<div class="card--excerpt">
+		<div class="flex-row input-area">
+			<strong class="name">Price:</strong>
+			<input ng-if="updating" ng-model="reward.price" class="input" type="number" name="price" placeholder="Price in {{config.keyword.plural}}">
+			<span class="input" ng-if="!updating && reward.price">
+				{{ reward.price | number }}
+				<span class="emoji" ng-bind="(config.keyword.token|emojis)")></span>
+			</span>
+			<p class="input placeholder" ng-if="!updating && !reward.price">Price for the review in {{config.keyword.plural}}</p>
+		</div>
+		<div class="flex-row input-area">
+			<strong class="name">Detail:</strong>
+			<textarea ng-if="updating" ng-model="reward.detail" class="input" name="detail" placeholder="Detail about the reward."></textarea>
+			<p class="input" ng-if="!updating && reward.detail" ng-bind="reward.detail"></p>
+			<p class="input placeholder" ng-if="!updating && !reward.detail">Add a detail for the review</p>
+		</div>
+	</div>
+	<div class="card--footer flex-row-align-end" ng-class="{'footer-show': (!isNew && updating) || (isNew && updating && hasChanged())}">
+		<div ng-if="!isNew">
+			<a class="btn btn-red" ng-click="remove()">Remove</a>
+		</div>
+		<span class="flex-1"></span>
+		<div ng-if="hasChanged()">
+			<a ng-if="!btnMessage" class="btn btn-blue" ng-click="save()">Save</a>
+			<a ng-if="btnMessage" ng-bind="btnMessage" class="btn btn-blue" ng-click="save()"></a>
+		</div>
+	</div>
+</div>

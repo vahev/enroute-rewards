@@ -1,0 +1,21 @@
+{
+  "name": "Enroute Rewards",
+  "description": "",
+  "main": "index.js",
+  "authors": [
+    "Rodrigo Rodriguez <rodrigo.rodriguez@enroute.xyz>"
+  ],
+  "license": "ISC",
+  "homepage": "https://github.com/enroutesystems/enroute-rewards",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "angular": "angularjs#^1.7.5",
+    "emoji-js": "^0.3.0"
+  }
+}

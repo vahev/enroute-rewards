@@ -1,0 +1,17 @@
+extends layout
+
+block content
+	section.background-grey(ng-controller="RewardsController")
+		div.content.container
+			div.flex-row-align-center.no-padding
+				div.col-9.rewards
+					div.flex-row
+						div.col.flex-1
+							h1 Rewards (
+								span(ng-bind="rewards|length")
+								|)
+					div.flex-row-wrap
+						div.col.col-3(ng-repeat="(key, reward) in rewards")
+							reward-card(reward="reward" key="key" on-remove="fetchRewards()")
+						div.col.col-3
+							reward-card(ng-if="newReward" reward="newReward" is-new="true" on-new="fetchRewards()")

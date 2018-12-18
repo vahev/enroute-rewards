@@ -1,0 +1,40 @@
+$scale-dots: .45;
+
+$first-dot-translate-y: 90px;
+@keyframes dot-3-move {
+	20% {transform: scale(1)}
+	45% {transform: translateY(-18px) scale($scale-dots)}
+	60% {transform: translateY(-$first-dot-translate-y) scale($scale-dots)}
+	80% {transform: translateY(-$first-dot-translate-y) scale($scale-dots)}
+	100% {transform: translateY(0px) scale(1)}
+}
+
+$dots-translate-x: 80px;
+$dots-translate-y: 60px;
+@keyframes dot-2-move {
+	20% {transform: scale(1)}
+	45% {transform: translate(-16px, 12px) scale($scale-dots)}
+	60% {transform: translate(-($dots-translate-x), $dots-translate-y) scale($scale-dots)}
+	80% {transform: translate(-($dots-translate-x), $dots-translate-y) scale($scale-dots)}
+	100% {transform: translateY(0px) scale(1)}
+}
+
+@keyframes dot-1-move {
+	20% {transform: scale(1)}
+	45% {transform: translate(16px, 12px) scale($scale-dots)}
+	60% {transform: translate($dots-translate-x, $dots-translate-y) scale($scale-dots)}
+	80% {transform: translate($dots-translate-x, $dots-translate-y) scale($scale-dots)}
+	100% {transform: translateY(0px) scale(1)}
+}
+
+@keyframes rotate-move {
+	55% {transform: translate(-50%, -50%) rotate(0deg)}
+	80% {transform: translate(-50%, -50%) rotate(360deg)}
+	100% {transform: translate(-50%, -50%) rotate(360deg)}
+}
+
+@keyframes index {
+	0%, 100% {z-index: 3}
+	33.3% {z-index: 2}
+	66.6% {z-index: 1}
+}
