@@ -186,10 +186,8 @@ if (util.isProduction(ENVIRONMENT) || util.isTest(ENVIRONMENT)) {
 				});
 
 				leaderboard = leaderboard.slice(0,10);
-				var count = 1;
 				leaderboard.forEach(function(user, index) {
 					lmessage = lmessage.concat(`${index+1}. <@${user[0]}> : ${user[1]} ${plural} \n`);
-					count++;
 				});
 					
 				bot.reply(message, '=====Top 10===== \n ' + lmessage);
