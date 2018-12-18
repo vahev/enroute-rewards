@@ -21,7 +21,11 @@ const ENVIRONMENT = config.get('ENVIRONMENT', 'local'),
 			PING  = config.get('PING', false);
 
 var bot = controller.spawn({token: config.get('slack').bot.token});
+<<<<<<< HEAD
 var invalidUsers = ['test_user'];
+=======
+
+>>>>>>> a0e048601ceedcb812d17e3a4d7a70d883f86920
 
 /*--------
 Express
@@ -56,6 +60,7 @@ const { token, singular, plural } = config.get('keyword'),
 util.setKeyword(config.get('keyword'));
 
 /*--------
+<<<<<<< HEAD
 Command list
 --------*/
 const commandList = [
@@ -74,6 +79,34 @@ Cron
 --------*/
 cron.schedule('59 23 * * ' + config.get('schedule').days, function() {
 	cleanDeletedUsers();
+=======
+Invalid Users
+--------*/
+const invalidUsers = [
+	'test_user',
+	'USLACKBOT'
+];
+
+
+/*--------
+Command list
+--------*/
+const commandList = [
+	{
+		message: `Displays the ${singular} leaderboard, it can be used on any channel where the bot is invited.`,
+		name: 'Show Leaderboard'
+	},
+	{
+		message: `Displays the actual quantity of ${plural} you have, this command need to be a direct message to the bot.`,
+		name: `my ${plural} quantity`
+	}
+];
+
+/*--------
+Cron
+--------*/
+cron.schedule('59 23 * * ' + config.get('schedule').days, function() {
+>>>>>>> a0e048601ceedcb812d17e3a4d7a70d883f86920
 	db.resetCoins();
 },{
 	scheduled: true,
@@ -235,19 +268,30 @@ controller.hears(`my ${plural} quantity`, 'direct_message', function(bot, messag
 	});
 });
 
+<<<<<<< HEAD
 function cleanDeletedUsers() {
 	request(`https://slack.com/api/users.list?token=${config.get('token')}&include_locale=true&pretty=1`, function (error, response, body) { 
+=======
+
+function userTimeOffset(user) {
+	request(`https://slack.com/api/users.info?token=${config.get('token')}&user=${user}&locale=true`, function (error, response, body) {
+>>>>>>> a0e048601ceedcb812d17e3a4d7a70d883f86920
 		if (error) {
 			console.log('error:', error); // Print the error if one occurred
 		}
 		else {
 			console.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received
+<<<<<<< HEAD
 			var members = JSON.parse(body).members;
 			members.forEach(function(member) {
 				if(member.deleted) {
 					db.deleteUser(member.id, member.name);
 				}
 			});
+=======
+			var data = JSON.parse(body).user
+			db.setUserTimeOffset(user, data['tz'], data['tz_offset']);
+>>>>>>> a0e048601ceedcb812d17e3a4d7a70d883f86920
 		}
 	});
 }

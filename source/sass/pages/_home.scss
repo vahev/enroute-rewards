@@ -1,0 +1,17 @@
+.rewards {
+	.input-area {
+		& + .input-area {
+			margin-top: 1em;
+		}
+		.name {
+			flex: 1;
+			text-align: right;
+		}
+		.input {
+			flex: 3;
+		}
+		textarea {
+			max-height: 10em;
+		}
+	}
+}

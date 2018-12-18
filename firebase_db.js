@@ -1,13 +1,12 @@
 var firebase = require('firebase'),
-    fs       = require('fs'),
-    config = require('./config.js');
+		config = require('./config');
 
 const default_user = {
   coins: 5,
   total_coins: 0
 };
 
-firebase.initializeApp(config.firebase);
+firebase.initializeApp(config.get('firebase'));
 
 function sendTokens(giverId, receiversIds, tokenQuantity, eachTransaction) {
   var i = 0;
@@ -30,6 +29,7 @@ function sendTokens(giverId, receiversIds, tokenQuantity, eachTransaction) {
             from: giverId,
             to: receiverId,
             quantity: tokenQuantity,
+            type: "tokenGift",
             date: firebase.database.ServerValue.TIMESTAMP
           })
           .then(function() {
@@ -64,6 +64,22 @@ function getUser(user) {
   });
 }
 
+function setUserTimeOffset(userID, timezone, timezoneOffset) {
+  console.log(`timezoneOffset ======> ${timezoneOffset}`);
+  var ref = firebase.database().ref(`users/${userID}`); 
+  console.log(`timezone ======> ${timezone}`);
+  ref.once("value")
+  .then(function(snapshot) {
+    if(snapshot.child('timeZone').val() == null) {
+      var usertz = firebase.database().ref(`users/${userID}`).child('timezone');
+      usertz.update({
+        'timezone': timezone,
+        'timezoneOffset': timezoneOffset
+      });
+    }
+  }); 
+}
+
 function getUserTokens(user) {
   return firebase.database().ref('users/' + user + '/coins');
 }
@@ -90,5 +106,6 @@ module.exports = {
   getUserTokens: getUserTokens,
   getUser: getUser,
   getUsers: getUsers,
-  resetCoins: resetCoins
+  resetCoins: resetCoins,
+  setUserTimeOffset: setUserTimeOffset
 }

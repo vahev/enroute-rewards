@@ -1,0 +1,52 @@
+extends layout
+
+block content
+	div.background-grey
+		div.content.container
+			div.flex-row-align-center.no-padding
+				div.col-12.rewards
+					div.flex-row
+						div.col.col-12
+							h1 Rewards
+					div.flex-row-wrap
+						each reward, index in JSON.parse(JSON.stringify(config.rewards))
+							div.col.col-3
+								div.card.card-less-padding
+									div.card--image
+										a
+											img(src="http://stage.roier.co/wp-content/uploads/2018/09/case-study-1-768x339.png")
+									h4.flex-row-between= reward.name
+										a.btn-ghost.btn-small.btn-edit
+											i.edit
+											span Edit
+									div.excerpt
+										p
+											strong Price:&nbsp;
+											span= reward.price + " " + config.local.keyword.plural
+										p
+											strong Detail:&nbsp;
+											if(reward.detail)
+												span= reward.detail
+						div.col.col-3
+							div.card.card-less-padding
+								div.card--image
+									a
+										img(src="http://stage.roier.co/wp-content/uploads/2018/09/case-study-1-768x339.png")
+								h4 New 2
+								div.excerpt
+									p.flex-row.input-area
+										strong.name Price:&nbsp;
+										input.input(type="text" name="price" placeholder="Price in " + config.local.keyword.plural)
+									p.flex-row.input-area
+										strong.name Detail:&nbsp;
+										textarea.input(name="detail" placeholder="Detail about the reward.")
+								a.btn.btn-blue Save
+								
+			div.flex-row-align-center
+				div.col-8
+					h1 App Config
+					pre= JSON.stringify(config.app, null, 4) 
+			div.flex-row-align-center
+				div.col-8
+					h1 Local Config
+					pre= JSON.stringify(config.local, null, 4)

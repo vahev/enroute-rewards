@@ -1,0 +1,17 @@
+@import url('https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700');
+
+@font-face {
+	font-family: 'GT Walsheim';
+	src: url('../fonts/GT-Walsheim-Bold-Oblique.woff2') format('woff2'),
+			url('../fonts/GT-Walsheim-Bold-Oblique.woff') format('woff');
+	font-weight: bold;
+	font-style: italic;
+}
+
+@font-face {
+	font-family: 'GT Walsheim';
+	src: url('../fonts/GT-Walsheim-Bold.woff2') format('woff2'),
+			url('../fonts/GT-Walsheim-Bold.woff') format('woff');
+	font-weight: bold;
+	font-style: normal;
+}
