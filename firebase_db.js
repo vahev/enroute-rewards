@@ -78,7 +78,7 @@ function setUserTimeOffset(userID, timezone, timezoneOffset) {
       });
     }
   });
-
+}
 
 function getUserTokens(user) {
   return firebase.database().ref('users/' + user + '/coins');
