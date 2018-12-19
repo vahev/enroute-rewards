@@ -122,10 +122,15 @@ const commandList = [
 Reset Tokens
 --------*/
 
-controller.hears(`reset daily ${plural}`, 'direct_message', function(bot, message) {
+controller.hears(`reset daily ${plural}`, 'direct_message', (bot, message) => {
 	if (config.get('admins').includes(message.user)) {
-		db.resetCoins();
-		bot.reply(message, `The ${plural} has been reset.`);
+		db.reset()
+			.then(() => {
+				bot.reply(message, `The ${plural} has been reset.`);
+			})
+			.catch((error) => {
+				bot.reply(error, `Error while reset the ${plural}.`);
+			});
 	} else {
 		bot.reply(message, `You don't have permission to do this command.`);
 	}
@@ -165,6 +170,8 @@ if (util.isProduction(ENVIRONMENT)) {
 							convo.say(`*You don't have enough ${plural}.* You're trying to send *` + tokensToSend + '* '+util.tokenHumanize(tokens)+messageLeft);
 						});
 				} else {
+					logger.info('tokens');
+					logger.info(tokens);
 					db.sendTokens(giverId, receiversIds, tokens, function(receiverId) {
 							bot.startPrivateConversation({ user: receiverId }, function(response, convo) {
 									convo.say(`You received *${tokens}* ${util.tokenHumanize(tokens)} from <@${giverId}>`);
@@ -172,6 +179,8 @@ if (util.isProduction(ENVIRONMENT)) {
 						})
 						.then(function() {
 							if (receiversIds.length == 1) {
+								logger.info('tokensLeft');
+								logger.info(tokensLeft);
 								messageLeft = (tokensLeft === 0) ? `, that was your last token. Don't worry tomorrow you will have more ${plural}.` : ', now you only have ' + tokensLeft + ' '+util.tokenHumanize(tokensLeft)+' left.';
 								bot.startPrivateConversation({ user: giverId }, function(response, convo) {
 									convo.say(`You sent *${tokens}* ${util.tokenHumanize(tokens)} to <@${receiversIds[0]}>${messageLeft}`);

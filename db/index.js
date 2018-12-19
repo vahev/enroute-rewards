@@ -155,10 +155,22 @@ function sendTokens(giverId, receiversIds, tokenQuantity, eachTransaction) {
 	});
 }
 
-function resetCoins() {
-	firebase.database().ref('users/').once('value', function(snapshot) {
-		Object.keys(snapshot.val()).forEach((key) => {
-			firebase.database().ref(`users/${key}/coins`).set(config.get('defaultCoins'));
+function reset() {
+	return new Promise(function(resolve, reject) {
+		firebase.database().ref('users/').once('value', function(snapshot) {
+			const keys = Object.keys(snapshot.val());
+			let i = 0;
+			keys.forEach((key) => {
+				firebase.database().ref(`users/${key}/coins`)
+					.update(config.get('defaultCoins'))
+					.catch((error) => reject(error))
+					.finally(() => {
+						i += 1;
+						if (i >= keys.length) {
+							resolve(true);
+						}
+					});
+			});
 		});
 	});
 }
@@ -168,7 +180,7 @@ module.exports = {
 	getUserTokens,
 	getUsers,
 	getValidUsers,
-	resetCoins,
+	reset,
 	sendTokens,
 	setUserTimeOffset,
 	updateUsersWithSlack
