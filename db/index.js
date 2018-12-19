@@ -159,14 +159,12 @@ function reset() {
 	return new Promise(function(resolve, reject) {
 		firebase.database().ref('users').once('value', function(snapshot) {
 			const keys = Object.keys(snapshot.val());
-			logger.info(`keys`);
-			logger.info(JSON.stringify(keys));
 			let i = 0;
 			keys.forEach((key) => {
 				logger.info(`reset`);
 				logger.info(`users/${key}/coins`);
 				firebase.database().ref(`users/${key}/coins`)
-					.update(config.get('defaultCoins'))
+					.set(config.get('defaultCoins'))
 					.catch((error) => reject(error))
 					.finally(() => {
 						i += 1;
