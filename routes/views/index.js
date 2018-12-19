@@ -51,11 +51,11 @@ async function showLeaderboard(req, res) {
 	});
 }
 
-router.get('/', isAuthenticated, async (req, res) => {
-	if (config.isAdmin(req.user)) {
-		await showConfiguration(req, res);
+router.get('/', (req, res) => {
+	if (req.isAuthenticated() && config.isAdmin(req.user)) {
+		res.redirect('/configuration/');
 	} else {
-		await showLeaderboard(req, res);
+		res.redirect('/leaderboard/');
 	}
 });
 
@@ -69,6 +69,25 @@ router.get('/configuration/', isAuthenticated, async (req, res) => {
 
 router.get('/leaderboard/', async (req, res) => {
 	await showLeaderboard(req, res);
+});
+
+router.get('/about/', async (req, res) => {
+	res.render('about', {
+		app: {
+			title: config.get('title')
+		},
+		config: {
+			app: await config.getApp(),
+			local: await config.getAll()
+		},
+		user: {
+			isAdmin: (req.user) ? config.isAdmin(req.user) : false
+		},
+		view: {
+			title: 'About',
+			url: 'about'
+		}
+	});
 });
 
 router.get('/logout/', function(req, res) {

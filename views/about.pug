@@ -1,0 +1,10 @@
+extends layout
+block content
+	section.background-grey.flex-column.flex-1
+			div.flex-row-align-center.no-padding
+				div.content.container
+					div.flex-row
+						div.col.col-offset-4.col-4
+							- var emoji = `<span class="emoji" ng-bind="'` + config.local.keyword.token + `'|emojis"></span>`;
+							h1 Thank you
+							p So many !{emoji} to share, all the errors and bugs that you found are really valuable to the development team.<br/><br/>That’s all folks! and get ready for next features (🔥).
