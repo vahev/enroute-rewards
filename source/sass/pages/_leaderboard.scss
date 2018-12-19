@@ -5,6 +5,7 @@
 		position: relative;
 		font-family: $font-family-source-sans;
 		font-weight: normal;
+		margin-left: 55px;
 		p {
 			display: flex;
 			flex-direction: row;
@@ -14,10 +15,10 @@
 			position: absolute;
 			font-family: $font-family-source-sans;
 			top: 2px;
-			left: -2.4em;
+			left: -65px;
 			text-align: right;
 			font-size: 1em;
-			width: 2em;
+			width: 55px;
 			-webkit-font-smoothing: antialiased;
 			content: counter(counter-leaderboard);
 			counter-increment: counter-leaderboard;
@@ -31,7 +32,7 @@
 			}
 			.picture {
 				max-width: 40px;
-				border-radius: 4px;
+				border-radius: 40px;
 			}
 		}
 		& + li {
@@ -49,7 +50,7 @@
 	.picture {
 		max-width: 30px;
 		border-radius: 30px;
-		margin-right: 4px;
+		margin-right: 8px;
 	}
 	.name {
 		.emoji{
@@ -58,10 +59,17 @@
 			margin-left: .1em;
 		}
 	}
+	.line {
+		height: 1px;
+		background-image: linear-gradient(to right, $color-gray-ligth 14.28%, rgba($color-gray-ligth, 0) 0%);
+		background-position: bottom;
+		background-size: 7px 1px;
+		background-repeat: repeat-x;
+		margin: 5px 10px 0;
+	}
 	.total {
 		font-family: $font-family-source-sans;
 		font-weight: normal;
-		margin-left: 1em;
 		font-size: 0.8em;
 		.emoji {
 			position: relative;

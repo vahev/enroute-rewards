@@ -1,10 +1,11 @@
 app.directive('rewardCard', () => ({
 		controller: [
-			'$log', '$scope', 'rewardsService', 'configService',
-			($log, $scope, $rewards, $config) => {
+			'$log', '$scope', '$element', 'rewardsService', 'configService',
+			($log, $scope, $element, $rewards, $config) => {
 				$scope.config = $config;
 				$scope.updating = false;
 				$scope.uploading = false;
+				$scope.isAdmin = typeof $element.attr('is-admin') !== 'undefined';
 
 				if (!$scope.reward || $scope.isNew) {
 					$scope.reward = $rewards.reward({

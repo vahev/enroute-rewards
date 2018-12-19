@@ -1,5 +1,15 @@
 reward-card {
 	margin-bottom: 48px;
+	.card {
+		min-height: 400px;
+		max-height: 400px;
+		display: flex;
+		flex-direction: column;
+		&.updating {
+			min-height: 500px;
+			max-height: 500px;
+		}
+	}
 	.card--image {
 		margin: -48px -48px 0 -48px;
 		height: 200px;
@@ -100,6 +110,7 @@ reward-card {
 	.card--header {
 		h4 {
 			line-height: 1.2em;
+			margin-bottom: 0;
 			input {
 				width: 100%;
 				flex: 1;
@@ -112,6 +123,9 @@ reward-card {
 		.btn-action {
 			line-height: 2.2em;
 		}
+		.card--price {
+			color: $color-dark;
+		}
 	}
 	.card--excerpt {
 		margin-top: 1em;
@@ -119,12 +133,31 @@ reward-card {
 		color: $color-gray-ligth;
 		text-overflow: ellipsis;
 		overflow: hidden;
+		display: flex;
+		flex-direction: column;
+		flex: 1;
+		.detail {
+			font-size: 0.8em;
+			font-style: italic;
+			max-height: 3.7em;
+			word-break: break-word;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			padding-right: 30px;
+		}
 		.input-area {
 			.name {
 				justify-content: flex-end;
 			}
 			.input {
 				margin-bottom: 0;
+			}
+			&.input-area-textarea {
+				flex: 1;
+				textarea {
+					height: 5em;
+					max-height: 7em;
+				}
 			}
 		}
 	}

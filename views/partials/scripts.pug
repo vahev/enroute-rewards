@@ -4,7 +4,7 @@ else
 	script(src="https://www.gstatic.com/firebasejs/5.0.0/firebase-app.js")
 	script(src="https://www.gstatic.com/firebasejs/5.0.0/firebase-storage.js")
 script(src="/js/lib.min.js")
-if config.local.ENVIRONMENT === "test"
+if config.local.ENVIRONMENT === "test" || config.local.ENVIRONMENT === "local"
 	script(src="/js/app.js")
 else
 	script(src="/js/app.min.js")

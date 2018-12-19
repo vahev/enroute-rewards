@@ -1,10 +1,14 @@
 extends layout
 
 block content
-	section.background-grey(ng-controller="LeaderboardController")
+	section
 		div.content.container
+			div.flex-row-align-center
+				div.col-8
+					h2.col-5.col-padding-0.home-extract Check out who's #1
+	section.background-grey(ng-controller="LeaderboardController")
 			div.flex-row-align-center.no-padding
-				div.col-9.rewards
+				div.col-8.rewards
 					ol.flex-column.leaderboard
 						li(ng-repeat="(key, user) in leaderboard | orderBy:'total_coins':true" ng-class="{'top-ten': $index < 10}")
 							p
@@ -14,6 +18,7 @@ block content
 									span(ng-if="!user.real_name && user.name" ng-bind="user.name")
 									span(ng-if="!user.real_name && !user.name" ng-bind="user.id")
 									span.emoji(ng-bind-html="(user.status_emoji|emojis)")
+								span.line.flex-1
 								span.total
 									span(ng-bind="user.total_coins|number")
 									span.emoji(ng-bind-html="(config.keyword.token|emojis)")
