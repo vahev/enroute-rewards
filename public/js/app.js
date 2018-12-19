@@ -2,7 +2,7 @@
 /*eslint no-undef: "off"*/
 // build: 19/12/2018
 
-firebase.initializeApp({"apiKey":"AIzaSyBebYtKOqOxENgVbTfiNhWAxh4cr_Vn7Ec","authDomain":"rewards-cee1a.firebaseapp.com","databaseURL":"https://rewards-cee1a.firebaseio.com","projectId":"rewards-cee1a","storageBucket":"rewards-cee1a.appspot.com","messagingSenderId":"376174432289"});
+firebase.initializeApp({"apiKey":"AIzaSyD56HX-gb6mtAgXy0Nby6rdrWLNuSIAXeE","authDomain":"jw-rewards.firebaseapp.com","databaseURL":"https://jw-rewards.firebaseio.com","projectId":"jw-rewards","storageBucket":"jw-rewards.appspot.com","messagingSenderId":"283231607374"});
 const app = angular.module('rewards', ['ngSanitize']);
 const emoji = new EmojiConvertor();
 
@@ -30,7 +30,7 @@ app.factory('emojiService', [
 	})
 ]);
 
-if (window.location.hostname === 'rewards.io'){
+if (window.location.hostname === 'localhost:3000'){
 	const port = '4201';
 	var livereload = document.createElement('script');
 	livereload.setAttribute('src','http://127.0.0.1:' + port + '/livereload.js');
@@ -297,7 +297,7 @@ app.directive('uploadFile', () => ({
 );
 
 /*eslint no-undef: "off"*/
-app.factory('configService', [() => ({"title":"Enroute Rewards","keyword":{"token":":taco:","singular":"taco","plural":"tacos"}})]);
+app.factory('configService', [() => ({"title":"jwplayer rewards","keyword":{"token":":cookie:","singular":"cookie","plural":"cookies"}})]);
 
 const LEADERBOARD_ENDPOINT = '/leaderboard/';
 

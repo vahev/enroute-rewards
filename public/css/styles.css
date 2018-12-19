@@ -200,7 +200,7 @@ code, kbd, pre, samp {
       left: -2px;
       width: 100%;
       height: 100%;
-      background-color: #FCEE22;
+      background-color: #FF0046;
       padding: 0px 2px;
       z-index: -1;
       box-sizing: content-box; }
@@ -372,7 +372,7 @@ code, kbd, pre, samp {
           background-color: #555555;
           animation: dot-2-move 6s ease infinite, index -6s ease infinite; }
         .card--updating .dots .dot.dot-1 {
-          background-color: #FCEE22;
+          background-color: #FF0046;
           animation: dot-1-move 6s ease infinite, index 0s ease infinite; }
   .card.uploading .card--image,
   .card.uploading .card--header,
@@ -435,8 +435,8 @@ header#header {
     padding: 10px 6px 4px 7px;
     margin: -10px 0 -9px -7px; }
   header#header .site-logo {
-    width: 26px;
-    height: 26px; }
+    width: 40px;
+    height: 40px; }
   header#header .site-branding {
     margin-bottom: 0px; }
     @media (min-width: 768px) {
@@ -531,7 +531,7 @@ header#header {
           height: 100%;
           top: 0;
           left: -2px;
-          background-color: #FCEE22;
+          background-color: #FF0046;
           z-index: -1;
           padding: 0px 2px;
           box-sizing: content-box; }
@@ -1027,7 +1027,7 @@ reward-card {
           background-color: #555555;
           animation: dot-2-move 6s ease infinite, index -6s ease infinite; }
         reward-card--updating .dots .dot.dot-1 {
-          background-color: #FCEE22;
+          background-color: #FF0046;
           animation: dot-1-move 6s ease infinite, index 0s ease infinite; }
   reward-card.uploading .card--image,
   reward-card.uploading .card--header,
