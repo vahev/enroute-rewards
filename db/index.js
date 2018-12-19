@@ -165,13 +165,13 @@ function reset() {
 				logger.info(`users/${key}/coins`);
 				firebase.database().ref(`users/${key}`)
 					.update({coins: config.get('defaultCoins')})
-					.catch((error) => reject(error))
-					.finally(() => {
+					.then(() => {
 						i += 1;
 						if (i >= keys.length) {
 							resolve(true);
 						}
-				});
+					})
+					.catch((error) => reject(error));
 			});
 		});
 	});
