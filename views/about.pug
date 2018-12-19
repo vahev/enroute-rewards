@@ -5,6 +5,6 @@ block content
 				div.content.container
 					div.flex-row
 						div.col.col-offset-4.col-4
-							- var emoji = `<span class="emoji" ng-bind="'` + config.local.keyword.token + `'|emojis"></span>`;
+							- var emoji = `<span class="emoji" ng-bind-html="'` + config.local.keyword.token + `'|emojis"></span>`;
 							h1 Thank you
-							p So many !{emoji} to share, all the errors and bugs that you found are really valuable to the development team.<br/><br/>That’s all folks! and get ready for next features (🔥).
+							p So many !{emoji} to share, all the errors and bugs that you found are really valuable to the development team.<br/><br/>That’s all folks! and get ready for next features 🔥
