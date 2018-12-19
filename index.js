@@ -199,30 +199,14 @@ Dashboard Listener
 --------*/
 if (util.isProduction(ENVIRONMENT) || util.isTest(ENVIRONMENT)) {
 	controller.hears('show leaderboard', 'ambient', function(bot, message) {
-		var users = [], leaderboard = [], lmessage = '';
-
-
-		db.getUsers()
-		.then(function(snapshot) {
-			users = Object.keys(snapshot.val());
-			for (const user in users) {
-				if (!invalidUsers.includes(users[user])) {
-					var tokens = snapshot.child(users[user]).child('total_coins').val();
-					if (tokens > 0) {
-						leaderboard.push([users[user], tokens]);
-					}
-				}
-			}
-				leaderboard.sort(function(a, b) {
-					return b[1] - a[1];
-				});
-
-				leaderboard = leaderboard.slice(0,10);
-				leaderboard.forEach(function(user, index) {
-					lmessage = lmessage.concat(`${index+1}. <@${user[0]}> : ${user[1]} ${plural} \n`);
-				});
-
-				bot.reply(message, '=====Top 10===== \n ' + lmessage);
+		let leaderboard = [];
+		db.getValidUsers()
+		.then(function(users) {
+				leaderboard = users.slice(0,10);
+				const result = leaderboard
+					.map((user, index) => `${index+1}. <@${user.id}> : ${user.total_coins} ${plural}`)
+					.join('\n');
+				bot.reply(message, `===== Top 10 ===== \n ${result}`);
 			});
 	});
 }

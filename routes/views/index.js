@@ -42,7 +42,7 @@ async function showLeaderboard(req, res) {
 		},
 		leaderboard: await db.getUsers(),
 		user: {
-			isAdmin: config.isAdmin(req.user)
+			isAdmin: (req.user) ? config.isAdmin(req.user) : false
 		},
 		view: {
 			title: 'Leaderboard',
@@ -67,7 +67,7 @@ router.get('/configuration/', isAuthenticated, async (req, res) => {
 	}
 });
 
-router.get('/leaderboard/', isAuthenticated, async (req, res) => {
+router.get('/leaderboard/', async (req, res) => {
 	await showLeaderboard(req, res);
 });
 
