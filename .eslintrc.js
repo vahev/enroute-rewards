@@ -4,6 +4,12 @@ module.exports = {
 				"node": true,
 				"browser": true
 		},
+		"globals": {
+			"firebase": true,
+			"angular": true,
+			"app": true,
+			"base_path": true
+		},
 		"extends": "eslint:recommended",
 		"parserOptions": {
 				"ecmaVersion": 2018
@@ -95,7 +101,7 @@ module.exports = {
 				"max-lines": "error",
 				"max-lines-per-function": "off",
 				"max-nested-callbacks": "error",
-				"max-params": "error",
+				"max-params": "off",
 				"max-statements": "off",
 				"max-statements-per-line": "error",
 				"multiline-comment-style": "off",

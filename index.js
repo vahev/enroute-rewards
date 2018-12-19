@@ -1,20 +1,29 @@
+global.base_path = `${__dirname}/`;
+
 /*--------
 Init
 --------*/
-var util       = require('./util'),
-	logger     = require('./logger')('index'),
-	Botkit     = require('botkit'),
-	cron	   = require('node-cron'),
-	https	   = require('https'),
-	http	   = require('http'),
-	request    = require('request'),
-	db		   = require('./firebase_db'),
-	config     = require('./config'),
-	controller = Botkit.slackbot({
-					clientSigningSecret: config.get('slack').slackbot.clientSecret,
-					debug: false
-				}),
-	express    = require('express');
+var util = require('./util'),
+		logger = require('./logger')('index'),
+		Botkit = require('botkit'),
+		cron	 = require('node-cron'),
+		https	 = require('https'),
+		http	 = require('http'),
+		db		 = require('./firebase_db'),
+		config = require('./config'),
+		controller = Botkit.slackbot({
+			clientSigningSecret: config.get('slack').slackbot.clientSecret,
+			debug: false
+		}),
+		express = require('express'),
+		session = require('express-session'),
+		bodyParser = require('body-parser'),
+		cookieParser = require('cookie-parser'),
+		MemoryStore = require('session-memory-store')(session),
+		uuid = require('uuid'),
+		passport = require('passport'),
+		// SlackStrategy = require('passport-slack').Strategy;
+		SlackStrategy = require('passport-slack-oauth2').Strategy;
 
 /*--------
 Params
@@ -27,17 +36,56 @@ var bot = controller.spawn({token: config.get('slack').bot.token});
 var invalidUsers = ['test_user'];
 
 /*--------
+Passport
+--------*/
+passport.use(new SlackStrategy({
+	clientID: config.get('slack').client_id,
+	clientSecret: config.get('slack').client_secret
+}, (accessToken, refreshToken, profile, done) => {
+	done(null, profile);
+}));
+
+const users = {};
+passport.serializeUser((user, done) => {
+	const id = uuid.v4();
+	users[id] = user;
+	done(null, id);
+});
+
+passport.deserializeUser((id, done) => {
+	done(null, users[id]);
+});
+
+/*--------
 Express
 --------*/
 const app = express();
 app.set('port', PORT);
 app.set('view engine', 'pug');
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(cookieParser());
+app.use(session({
+	resave: false,
+	saveUninitialized: false,
+	secret: '12345QWERTY-SECRET',
+	store: new MemoryStore()
+}));
 app.use(express.static('public'));
+app.use(passport.initialize());
+app.use(passport.session());
+app.use(bodyParser.json());
+
 
 /*--------
 Routes
 --------*/
-require('./routes')(app, config);
+// require('./routes')(app, config);
+
+// const rewards = require('./routes');
+app.use('/auth', require('./routes/auth'));
+app.use('/rewards', require('./routes/rewards'));
+app.use('/', require('./routes/views'));
 
 var server = http.createServer(app);
 server.listen(PORT);
@@ -207,27 +255,6 @@ controller.hears('help',	'direct_message', function(bot, message) {
 	});
 	bot.reply(message, attach);
 });
-
-/*--------
-Log every message received
---------*/
-// var excludeEvents = ['user_typing','bot_added','user_change','reaction_added','file_shared','file_public','dnd_updated_user','self_message','emoji_changed'];
-// controller.middleware.receive.use(function(bot, message, next) {
-// 	if (excludeEvents.indexOf(message.type) < 0) {
-// 		// console.log('RECEIVED: ', message);
-// 	}
-// 	message.logged = true;
-// 	next();
-// });
-
-/*--------
-Log every message sent
---------*/
-// controller.middleware.send.use(function(bot, message, next) {
-// 	// console.log('SENT: ', message);
-// 	message.logged = true;
-// 	next();
-// });
 
 /*--------
 Personal tokens list

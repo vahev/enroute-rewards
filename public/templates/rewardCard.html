@@ -1,50 +1,61 @@
-<div class="card card-less-padding">
+<div class="card card-less-padding" ng-class="{'updating': updating, 'uploading': uploading}">
+	<div class="card--updating">
+		<div class="overlay"></div>
+		<div class="dots">
+			<div class="dot dot-1"></div><div class="dot dot-2"></div><div class="dot dot-3"></div>
+		</div>
+	</div>
 	<div class="card--image">
-		<upload-file ng-if="(!imageURL && imageLoaded) || updating" url="reward.image"></upload-file>
+		<upload-file class="full" ng-if="isNew || ((!imageURL && imageLoaded) || updating)" url="reward.image"></upload-file>
 		<storage-image ng-if="imageURL && imageLoaded" url="reward.image"></storage-image>
 	</div>
-	<h4 class="flex-row-between">
-		<span class="card--name" ng-if="!updating && reward.name" ng-bind="reward.name"></span>
-		<input ng-if="updating" ng-model="reward.name" class="input" type="text" name="name" placeholder="Name">
-		<span class="flex-1"></span>
-		<a class="btn-ghost btn-small btn-action btn-edit" ng-if="!updating" ng-click="edit()">
-			<i class="icon edit"><?xml version="1.0" encoding="UTF-8"?>
+	<div class="card--header">
+		<h4 class="flex-row-between">
+			<span class="card--name" ng-if="!updating && reward.name" ng-bind="reward.name"></span>
+			<input ng-if="updating" ng-model="reward.name" class="input" type="text" name="name" placeholder="Name">
+			<a class="btn-ghost btn-small btn-action btn-edit" ng-if="!updating" ng-click="edit()">
+				<i class="icon edit"><?xml version="1.0" encoding="UTF-8"?>
 <svg width="48px" height="48px" viewBox="0 0 48 48" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
     <path d="M17.7394395,45.046089 C16.4785421,46.3069863 14.764306,47.0112587 12.9738435,47.0039743 L5.29078509,46.9727162 C4.04797004,46.9676598 3.03637041,45.9560602 3.03131408,44.7132452 L3.00005595,37.0301867 C2.99277155,35.2397242 3.69704395,33.5254881 4.95794128,32.2645908 L32.5283078,4.4782848 C34.4732976,2.51806133 37.6390984,2.50571193 39.5993219,4.45070166 C39.603937,4.4552809 39.6085431,4.45986913 39.6131403,4.46446633 L45.5395639,10.3908899 C47.4921854,12.3435114 47.4921854,15.5093363 45.5395639,17.4619577 C45.5349667,17.4665549 45.5303606,17.4711432 45.5257455,17.4757224 L17.7394395,45.046089 Z M35.3394091,7.2977945 L31.2962658,11.3091474 C30.9017081,11.705271 30.9017081,12.3430186 31.2934931,12.7363694 L37.2390498,18.7056866 C37.6351329,19.1002728 38.2703371,19.0977851 38.6605909,18.7029029 L42.7037342,14.69155 C43.0982919,14.2954264 43.0982919,13.6576787 42.7065069,13.264328 L36.7609502,7.2950108 C36.3648671,6.90042456 35.7296629,6.90291231 35.3394091,7.2977945 Z"></path>
 </svg>
 </i>
-			<span>Edit</span>
-		</a>
-		<a class="btn-ghost btn-small btn-action btn-cancel" ng-if="updating" ng-click="cancel()">
-			<i class="icon edit"><?xml version="1.0" encoding="UTF-8"?>
+				<span>Edit</span>
+			</a>
+			<a class="btn-ghost btn-small btn-action btn-cancel" ng-if="updating" ng-click="cancel()">
+				<i class="icon edit"><?xml version="1.0" encoding="UTF-8"?>
 <svg width="48px" height="48px" viewBox="0 0 48 48" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
 	<path d="M32.0604851,26.8465072 L40.5166979,37.4167732 C41.2187264,38.2943089 41.1486605,39.5593758 40.3540182,40.3540182 C39.5593758,41.1486605 38.2943089,41.2187264 37.4167732,40.5166979 L26.8465072,32.0604851 C25.7669743,31.1968588 24.2330257,31.1968588 23.1534928,32.0604851 L12.5832268,40.5166979 C11.7056911,41.2187264 10.4406242,41.1486605 9.64598184,40.3540182 C8.8513395,39.5593758 8.78127359,38.2943089 9.48330212,37.4167732 L17.9395149,26.8465072 C18.8031412,25.7669743 18.8031412,24.2330257 17.9395149,23.1534928 L9.48330212,12.5832268 C8.78127359,11.7056911 8.8513395,10.4406242 9.64598184,9.64598184 C10.4406242,8.8513395 11.7056911,8.78127359 12.5832268,9.48330212 L23.1534928,17.9395149 C24.2330257,18.8031412 25.7669743,18.8031412 26.8465072,17.9395149 L37.4167732,9.48330212 C38.2943089,8.78127359 39.5593758,8.8513395 40.3540182,9.64598184 C41.1486605,10.4406242 41.2187264,11.7056911 40.5166979,12.5832268 L32.0604851,23.1534928 C31.1968588,24.2330257 31.1968588,25.7669743 32.0604851,26.8465072 Z" id="Combined-Shape"></path>
 </svg>
 </i>
-			<span>Cancel</span>
-		</a>
-	</h4>
-	<div class="excerpt">
+				<span>Cancel</span>
+			</a>
+		</h4>
+	</div>
+	<div class="card--excerpt">
 		<div class="flex-row input-area">
-			<strong class="name">Price: </strong>
-			<span class="input">
-				<input ng-if="updating" ng-model="reward.price" class="input" type="number" name="price" placeholder="Price in {{config.keyword.plural}}">
-				<span ng-if="!updating && reward.price">
-					{{ reward.price | number }}
-					<span class="emoji" ng-bind="(config.keyword.token|emojis)")
-				</span>
+			<strong class="name">Price:</strong>
+			<input ng-if="updating" ng-model="reward.price" class="input" type="number" name="price" placeholder="Price in {{config.keyword.plural}}">
+			<span class="input" ng-if="!updating && reward.price">
+				{{ reward.price | number }}
+				<span class="emoji" ng-bind="(config.keyword.token|emojis)")></span>
 			</span>
+			<p class="input placeholder" ng-if="!updating && !reward.price">Price for the review in {{config.keyword.plural}}</p>
 		</div>
 		<div class="flex-row input-area">
-			<strong class="name">Detail:&nbsp;</strong>
+			<strong class="name">Detail:</strong>
 			<textarea ng-if="updating" ng-model="reward.detail" class="input" name="detail" placeholder="Detail about the reward."></textarea>
 			<p class="input" ng-if="!updating && reward.detail" ng-bind="reward.detail"></p>
 			<p class="input placeholder" ng-if="!updating && !reward.detail">Add a detail for the review</p>
 		</div>
 	</div>
-	<div class="card--footer flex-row-align-end" ng-class="{'footer-hidden': !hasChanged()}">
+	<div class="card--footer flex-row-align-end" ng-class="{'footer-show': (!isNew && updating) || (isNew && updating && hasChanged())}">
+		<div ng-if="!isNew">
+			<a class="btn btn-red" ng-click="remove()">Remove</a>
+		</div>
 		<span class="flex-1"></span>
-		<a ng-if="!btnMessage" class="btn btn-blue" ng-click="save()">Save</a>
-		<a ng-if="btnMessage" ng-bind="btnMessage" class="btn btn-blue" ng-click="save()"></a>
+		<div ng-if="hasChanged()">
+			<a ng-if="!btnMessage" class="btn btn-blue" ng-click="save()">Save</a>
+			<a ng-if="btnMessage" ng-bind="btnMessage" class="btn btn-blue" ng-click="save()"></a>
+		</div>
 	</div>
 </div>

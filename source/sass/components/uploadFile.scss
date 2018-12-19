@@ -1,0 +1,84 @@
+upload-file {
+	.placeholder {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		justify-content: center;
+		position: relative;
+		width: 100%;
+		height: 100%;
+		&:hover .upload svg {
+			fill: lighten($color-blue, 5%);
+		}
+		a.actions {
+			position: relative;
+			z-index: 3;
+			display: flex;
+			&.disabled {
+				pointer-events: none;
+			}
+		}
+		.icon {
+			width: 3em;
+			height: 3em;
+			cursor: pointer;
+			&.cancel {
+				border: 4px solid $color-white;
+				border-radius: 100%;
+				padding: 6px;
+				svg {
+					fill: $color-white;
+				}
+			}
+		}
+		.file-input {
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			opacity: 0;
+			cursor: pointer;
+			z-index: 0;
+		}
+		.overlay {
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			z-index: 2;
+			background: linear-gradient(180deg, rgba(0,0,0,0) 35%, rgba(0,0,0,.4) 100%);
+		}
+		.preview {
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			z-index: 1;
+		}
+		.preview-name {
+			position: absolute;
+			bottom: 0;
+			left: 0;
+			width: 100%;
+			z-index: 3;
+			text-align: center;
+			font-size: 0.75em;
+			color: white;
+			padding: 0.3em 0;
+			letter-spacing: 0.02em;
+			text-shadow: 0px 1px 2px rgba(0, 0, 0, 0.4);
+			cursor: default;
+		}
+	}
+	.full {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		z-index: 2;
+	}
+}

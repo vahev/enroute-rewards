@@ -1,7 +1,7 @@
 html(ng-app="rewards")
 	head
 		title= app.title
-		link(rel="shortcut icon" type="image/png" href="/favicon.png")
+		link(rel="shortcut icon" type="image/png" href="/img/favicon.png")
 		include partials/scripts
 		block scripts
 		include partials/styles
@@ -17,3 +17,18 @@ html(ng-app="rewards")
 								span= view.title
 			block content
 		include partials/footer
+		<svg xmlns="http://www.w3.org/2000/svg" version="1.1" style="display: none">
+			<defs>
+				<filter id="goo">
+					<feGaussianBlur in="SourceGraphic" stdDeviation="10" result="blur" />
+					<feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 21 -7"/>
+				</filter>
+			</defs>
+		</svg>
+		<svg width="300" height="250" style="display: none">
+			<defs>
+				<filter id="blurFilter">
+					<feGaussianBlur in="SourceGraphic" stdDeviation="2"/>
+				</filter>
+			</defs>
+		</svg>
