@@ -163,15 +163,15 @@ function reset() {
 			keys.forEach((key) => {
 				logger.info(`reset`);
 				logger.info(`users/${key}/coins`);
-				firebase.database().ref(`users/${key}/coins`)
-					.set(config.get('defaultCoins'))
+				firebase.database().ref(`users/${key}`)
+					.update({coins: config.get('defaultCoins')})
 					.catch((error) => reject(error))
 					.finally(() => {
 						i += 1;
 						if (i >= keys.length) {
 							resolve(true);
 						}
-					});
+				});
 			});
 		});
 	});

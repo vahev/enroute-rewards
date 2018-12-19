@@ -4,5 +4,5 @@ config.json
 firebase_config.json
 .DS_Store
 .sass-cache/
-public/
+# public/
 bower_components/
