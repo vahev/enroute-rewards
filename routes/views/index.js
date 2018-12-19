@@ -41,9 +41,9 @@ async function showLeaderboard(req, res) {
 			local: await config.getAll()
 		},
 		leaderboard: await db.getUsers(),
-		user: {
+		user: (req.user) ? {
 			isAdmin: (req.user) ? config.isAdmin(req.user) : false
-		},
+		} : false,
 		view: {
 			title: 'Leaderboard',
 			url: 'leaderboard'
@@ -60,9 +60,9 @@ async function showAbout(req, res) {
 			app: await config.getApp(),
 			local: await config.getAll()
 		},
-		user: {
+		user: (req.user) ? {
 			isAdmin: (req.user) ? config.isAdmin(req.user) : false
-		},
+		} : false,
 		view: {
 			title: 'Thank You',
 			url: 'about'
@@ -81,7 +81,7 @@ async function showRewards(req, res) {
 			rewards: await config.getRewards()
 		},
 		user: {
-			isAdmin: config.isAdmin(req.user),
+			isAdmin: config.isAdmin(req.user)
 		},
 		view: {
 			title: 'Rewards',

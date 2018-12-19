@@ -19,6 +19,6 @@ header#header
 								a(href="/rewards/") Rewards
 						li.menu-item(class={ 'current-menu-item': view.url == 'about' })
 							a(href="/about/") About
-						if (user.isAdmin)
+						if (user)
 							li.menu-item
 								a(href="/logout/") Logout
