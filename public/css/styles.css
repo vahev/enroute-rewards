@@ -290,7 +290,7 @@ code, kbd, pre, samp {
     border-radius: .5em; }
   .btn[disabled], [disabled].btn-blue, [disabled].btn-white, [disabled].btn-red, [disabled].btn-ghost {
     cursor: default;
-    color: #555555;
+    color: #F7F7F7;
     background-color: #A1A1A1; }
 
 .card {
