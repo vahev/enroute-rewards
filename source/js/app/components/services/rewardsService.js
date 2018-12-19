@@ -1,12 +1,11 @@
-const ENDPOINT = '/rewards/';
-
+const REWARDS_ENDPOINT = '/rewards/';
 
 app.factory('rewardsService', [
 	'$log', '$http', ($log, $http) => ({
-			get: (id) => $http.get(`${ENDPOINT}/${id}`),
-			getAll: () => $http.get(`${ENDPOINT}all`),
+			get: (id) => $http.get(`${REWARDS_ENDPOINT}/${id}`),
+			getAll: () => $http.get(`${REWARDS_ENDPOINT}all`),
 			getImageUrl: (url) => firebase.storage().ref().child(url).getDownloadURL(),
-			remove: (key) => $http.delete(`${ENDPOINT}delete/${key}`),
+			remove: (key) => $http.delete(`${REWARDS_ENDPOINT}delete/${key}`),
 			reward: (args) => {
 				function Reward(args){
 					Object.assign(this, args);
@@ -25,14 +24,14 @@ app.factory('rewardsService', [
 						ref.put(reward.image)
 							.then(() => {
 								reward.image = fileName;
-								resolve($http.post(`${ENDPOINT}update`, reward));
+								resolve($http.post(`${REWARDS_ENDPOINT}update`, reward));
 							})
 							.catch((err) => {
 								reject(err);
 							});
 					});
 				}
-				return $http.post(`${ENDPOINT}update`, reward);
+				return $http.post(`${REWARDS_ENDPOINT}update`, reward);
 			}
 		})
 ]);

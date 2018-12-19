@@ -1,0 +1,75 @@
+.leaderboard {
+	counter-reset: counter-leaderboard;
+	li {
+		line-height: 1.8em;
+		position: relative;
+		font-family: $font-family-source-sans;
+		font-weight: normal;
+		p {
+			display: flex;
+			flex-direction: row;
+			align-items: center;
+		}
+		&::before {
+			position: absolute;
+			font-family: $font-family-source-sans;
+			top: 2px;
+			left: -2.4em;
+			text-align: right;
+			font-size: 1em;
+			width: 2em;
+			-webkit-font-smoothing: antialiased;
+			content: counter(counter-leaderboard);
+			counter-increment: counter-leaderboard;
+		}
+		&.top-ten {
+			font-size: 2em;
+			font-family: $font-family-walsheim;
+			font-weight: bold;
+			&::before {
+				font-family: $font-family-walsheim;
+			}
+			.picture {
+				max-width: 40px;
+				border-radius: 4px;
+			}
+		}
+		& + li {
+			margin-top: 4px;
+		}
+		@for $i from 11 through 20 {
+			&:nth-child(#{$i}) {
+				font-size: 1em + ((20 - $i)/10);
+				.picture {
+					max-width: 30px + ((20 - $i)/1);
+				}
+			}
+		}
+	}
+	.picture {
+		max-width: 30px;
+		border-radius: 30px;
+		margin-right: 4px;
+	}
+	.name {
+		.emoji{
+			position: relative;
+			top: 2px;
+			margin-left: .1em;
+			&:empty {
+				display: none;
+			}
+		}
+	}
+	.total {
+		font-family: $font-family-source-sans;
+		font-weight: normal;
+		margin-left: 1em;
+		font-size: 0.8em;
+		.emoji {
+			position: relative;
+			top: 2px;
+			margin-left: 2px;
+		}
+	}
+}

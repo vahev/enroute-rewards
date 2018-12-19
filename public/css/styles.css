@@ -759,6 +759,99 @@ header#header {
   padding: 0em 1em;
   height: 2.2em; }
 
+.leaderboard {
+  counter-reset: counter-leaderboard; }
+  .leaderboard li {
+    line-height: 1.8em;
+    position: relative;
+    font-family: "Source Sans Pro", sans-serif;
+    font-weight: normal; }
+    .leaderboard li p {
+      display: flex;
+      flex-direction: row;
+      align-items: center; }
+    .leaderboard li::before {
+      position: absolute;
+      font-family: "Source Sans Pro", sans-serif;
+      top: 2px;
+      left: -2.4em;
+      text-align: right;
+      font-size: 1em;
+      width: 2em;
+      -webkit-font-smoothing: antialiased;
+      content: counter(counter-leaderboard);
+      counter-increment: counter-leaderboard; }
+    .leaderboard li.top-ten {
+      font-size: 2em;
+      font-family: "GT Walsheim", sans-serif;
+      font-weight: bold; }
+      .leaderboard li.top-ten::before {
+        font-family: "GT Walsheim", sans-serif; }
+      .leaderboard li.top-ten .picture {
+        max-width: 40px;
+        border-radius: 4px; }
+    .leaderboard li + li {
+      margin-top: 4px; }
+    .leaderboard li:nth-child(11) {
+      font-size: 1.9em; }
+      .leaderboard li:nth-child(11) .picture {
+        max-width: 39px; }
+    .leaderboard li:nth-child(12) {
+      font-size: 1.8em; }
+      .leaderboard li:nth-child(12) .picture {
+        max-width: 38px; }
+    .leaderboard li:nth-child(13) {
+      font-size: 1.7em; }
+      .leaderboard li:nth-child(13) .picture {
+        max-width: 37px; }
+    .leaderboard li:nth-child(14) {
+      font-size: 1.6em; }
+      .leaderboard li:nth-child(14) .picture {
+        max-width: 36px; }
+    .leaderboard li:nth-child(15) {
+      font-size: 1.5em; }
+      .leaderboard li:nth-child(15) .picture {
+        max-width: 35px; }
+    .leaderboard li:nth-child(16) {
+      font-size: 1.4em; }
+      .leaderboard li:nth-child(16) .picture {
+        max-width: 34px; }
+    .leaderboard li:nth-child(17) {
+      font-size: 1.3em; }
+      .leaderboard li:nth-child(17) .picture {
+        max-width: 33px; }
+    .leaderboard li:nth-child(18) {
+      font-size: 1.2em; }
+      .leaderboard li:nth-child(18) .picture {
+        max-width: 32px; }
+    .leaderboard li:nth-child(19) {
+      font-size: 1.1em; }
+      .leaderboard li:nth-child(19) .picture {
+        max-width: 31px; }
+    .leaderboard li:nth-child(20) {
+      font-size: 1em; }
+      .leaderboard li:nth-child(20) .picture {
+        max-width: 30px; }
+  .leaderboard .picture {
+    max-width: 30px;
+    border-radius: 30px;
+    margin-right: 4px; }
+  .leaderboard .name .emoji {
+    position: relative;
+    top: 2px;
+    margin-left: .1em; }
+    .leaderboard .name .emoji:empty {
+      display: none; }
+  .leaderboard .total {
+    font-family: "Source Sans Pro", sans-serif;
+    font-weight: normal;
+    margin-left: 1em;
+    font-size: 0.8em; }
+    .leaderboard .total .emoji {
+      position: relative;
+      top: 2px;
+      margin-left: 2px; }
+
 upload-file .placeholder {
   display: flex;
   flex-direction: row;

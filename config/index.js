@@ -50,6 +50,7 @@ module.exports = {
 		const configApp = await firebase.database().ref('config').once('value');
 		return configApp;
 	},
+	getCallbackURL: () => [get('https'), get('host') ,get('slack').redirect_uri].join(''),
 	getRewards: () => {
 		const configRewards = firebase.database().ref('rewards').once('value');
 		return configRewards;

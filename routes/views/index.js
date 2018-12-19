@@ -1,7 +1,8 @@
 var express = require('express'),
 		router = new express.Router(),
 		// logger = require(`${base_path}/logger`)('routes/views'),
-		config = require(`${base_path}/config`);
+		config = require(`${base_path}/config`),
+		db = require(`${base_path}/db`);
 
 function isAuthenticated(req, res, next) {
 	if (req.isAuthenticated()) {
@@ -39,6 +40,7 @@ async function showLeaderboard(req, res) {
 			app: await config.getApp(),
 			local: await config.getAll()
 		},
+		leaderboard: await db.getUsers(),
 		user: {
 			isAdmin: config.isAdmin(req.user)
 		},

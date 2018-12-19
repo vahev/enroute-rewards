@@ -9,7 +9,11 @@ const emoji = new EmojiConvertor();
 
 app.filter("emojis", function() {
 	return function(input) {
-		return emoji.replace_colons(input);
+		const emojiReplace = emoji.replace_colons(input);
+		if (emojiReplace !== input) {
+			return emojiReplace;
+		}
+		return "";
 	};
 });
 

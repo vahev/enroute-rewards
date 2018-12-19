@@ -9,7 +9,7 @@ var util = require('./util'),
 		cron	 = require('node-cron'),
 		https	 = require('https'),
 		http	 = require('http'),
-		db		 = require('./firebase_db'),
+		db		 = require('./db'),
 		config = require('./config'),
 		controller = Botkit.slackbot({
 			clientSigningSecret: config.get('slack').slackbot.clientSecret,
@@ -22,7 +22,6 @@ var util = require('./util'),
 		MemoryStore = require('session-memory-store')(session),
 		uuid = require('uuid'),
 		passport = require('passport'),
-		// SlackStrategy = require('passport-slack').Strategy;
 		SlackStrategy = require('passport-slack-oauth2').Strategy;
 
 /*--------
@@ -33,12 +32,13 @@ const ENVIRONMENT = config.get('ENVIRONMENT', 'local'),
 			PING  = config.get('PING', false);
 
 var bot = controller.spawn({token: config.get('slack').bot.token});
-var invalidUsers = ['test_user'];
+const invalidUsers = ['test_user'];
 
 /*--------
 Passport
 --------*/
 passport.use(new SlackStrategy({
+	callbackURL: config.getCallbackURL(),
 	clientID: config.get('slack').client_id,
 	clientSecret: config.get('slack').client_secret
 }, (accessToken, refreshToken, profile, done) => {
@@ -80,11 +80,9 @@ app.use(bodyParser.json());
 /*--------
 Routes
 --------*/
-// require('./routes')(app, config);
-
-// const rewards = require('./routes');
 app.use('/auth', require('./routes/auth'));
 app.use('/rewards', require('./routes/rewards'));
+app.use('/leaderboard', require('./routes/leaderboard'));
 app.use('/', require('./routes/views'));
 
 var server = http.createServer(app);
@@ -121,17 +119,6 @@ const commandList = [
 ];
 
 /*--------
-Cron
---------*/
-cron.schedule('59 23 * * ' + config.get('schedule').days, function() {
-	cleanDeletedUsers();
-	db.resetCoins();
-},{
-	scheduled: true,
-	timezone: config.get('timezone')
-});
-
-/*--------
 Reset Tokens
 --------*/
 
@@ -140,7 +127,7 @@ controller.hears(`reset daily ${plural}`, 'direct_message', function(bot, messag
 		db.resetCoins();
 		bot.reply(message, `The ${plural} has been reset.`);
 	} else {
-		bot.reply(message, "You don't have permission to do this command.");
+		bot.reply(message, `You don't have permission to do this command.`);
 	}
 });
 
@@ -172,27 +159,27 @@ if (util.isProduction(ENVIRONMENT)) {
 			db.getUser(giverId).then(function(user) {
 				var tokensLeft = (user.coins - tokensToSend);
 				if (tokensLeft < 0) {
-					messageLeft = (user.coins === 0) ? `, don\'t have *any* ${plural} at all. Tomorrow you will have more ${plural}.` : ', but you only have *' + user.coins + '*.';
+					messageLeft = (user.coins === 0) ? `, don't have *any* ${plural} at all. Tomorrow you will have more ${plural}.` : ', but you only have *' + user.coins + '*.';
 					bot.startPrivateConversation({ user: giverId },
 						function(response, convo) {
-							convo.say(`*You don\'t have enough ${plural}.* You\'re trying to send *` + tokensToSend + '* '+util.tokenHumanize(tokens)+messageLeft);
+							convo.say(`*You don't have enough ${plural}.* You're trying to send *` + tokensToSend + '* '+util.tokenHumanize(tokens)+messageLeft);
 						});
 				} else {
 					db.sendTokens(giverId, receiversIds, tokens, function(receiverId) {
 							bot.startPrivateConversation({ user: receiverId }, function(response, convo) {
-									convo.say('You received *'+tokens+'* '+util.tokenHumanize(tokens)+' from <@' + giverId + '>');
+									convo.say(`You received *${tokens}* ${util.tokenHumanize(tokens)} from <@${giverId}>`);
 								});
 						})
 						.then(function() {
 							if (receiversIds.length == 1) {
-								messageLeft = (tokensLeft === 0) ? `, that was your last token. Don\'t worry tomorrow you will have more ${plural}.` : ', now you only have ' + tokensLeft + ' '+util.tokenHumanize(tokensLeft)+' left.';
+								messageLeft = (tokensLeft === 0) ? `, that was your last token. Don't worry tomorrow you will have more ${plural}.` : ', now you only have ' + tokensLeft + ' '+util.tokenHumanize(tokensLeft)+' left.';
 								bot.startPrivateConversation({ user: giverId }, function(response, convo) {
-									convo.say('You sent *'+tokens+'* '+util.tokenHumanize(tokens)+' to <@'+receiversIds[0]+'>'+messageLeft);
+									convo.say(`You sent *${tokens}* ${util.tokenHumanize(tokens)} to <@${receiversIds[0]}>${messageLeft}`);
 								});
 							} else {
-								messageLeft = (tokensLeft === 0) ? ', those were your last tokens. Don\'t worry tomorrow you will have more tokens.' : ', now you only have ' + tokensLeft + ' '+util.tokenHumanize(tokensLeft)+' left.' + (tokensLeft === 1) ? ' Choose wisely.' : '';
+								messageLeft = (tokensLeft === 0) ? `, those were your last tokens. Don't worry tomorrow you will have more tokens.` : `, now you only have ${tokensLeft} ${util.tokenHumanize(tokensLeft)} left.` + (tokensLeft === 1) ? ' Choose wisely.' : '';
 								bot.startPrivateConversation({ user: giverId }, function(response, convo) {
-									convo.say('You sent a total of *' + tokensToSend + '* tokens to ' + util.usersArray(receiversIds)+messageLeft);
+									convo.say(`You sent a total of *${tokensToSend}* tokens to ` + util.usersArray(receiversIds) + messageLeft);
 								});
 							}
 						});
@@ -201,7 +188,7 @@ if (util.isProduction(ENVIRONMENT)) {
 		} else {
 			bot.startPrivateConversation({ user: giverId },
 				function(response, convo) {
-					convo.say(`Very funny, but you can\'t send ${plural} to yourself.`);
+					convo.say(`Very funny, but you can't send ${plural} to yourself.`);
 				});
 		}
 	});
@@ -244,10 +231,10 @@ if (util.isProduction(ENVIRONMENT) || util.isTest(ENVIRONMENT)) {
 Display command list
 --------*/
 var CommandListAttach = require('./attachments/command_list.js');
-controller.hears('help',	'direct_message', function(bot, message) {
+controller.hears('help', 'direct_message', (bot, message) => {
 	var attach = new CommandListAttach();
 	Object.keys(commandList).forEach((index) => {
-		console.log(commandList[index]);
+		// console.log(commandList[index]);
 		attach.attachments[0].fields.push({
 			"title": commandList[index].name,
 			"value": commandList[index].message
@@ -259,23 +246,26 @@ controller.hears('help',	'direct_message', function(bot, message) {
 /*--------
 Personal tokens list
 --------*/
-controller.hears(`my ${plural}`, 'direct_message', function(bot, message) {
-	db.getUsers(message.user).then(function(snapshot){
-		var coins = snapshot.child(message.user).child('total_coins').val();
-		bot.reply(message, `You have ${coins} ${plural}`);
+
+if (util.isProduction(ENVIRONMENT) || util.isTest(ENVIRONMENT)) {
+	controller.hears(`my ${plural}`, 'direct_message', function(bot, message) {
+		db.getUser(message.user)
+		.then((user) => {
+			bot.reply(message, `You have ${user.total_coins} ${plural}`);
+		});
 	});
-});
+}
 
 function cleanDeletedUsers() {
-	request(`https://slack.com/api/users.list?token=${config.get('token')}&include_locale=true&pretty=1`, function (error, response, body) {
+	request(`https://slack.com/api/users.list?token=${config.get('token')}&include_locale=true&pretty=1`, (error, response, body) => {
 		if (error) {
-			console.log('error:', error); // Print the error if one occurred
-		}
-		else {
-			console.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received
-			var members = JSON.parse(body).members;
-			members.forEach(function(member) {
-				if(member.deleted) {
+			// Print the error if one occurred
+			logger.error(error);
+		} else {
+			// Print the response status code if a response was received
+			logger.info(response);
+			JSON.parse(body).members.forEach(function(member) {
+				if (member.deleted) {
 					db.deleteUser(member.id, member.name);
 				}
 			});
@@ -301,9 +291,22 @@ controller.on('rtm_close', function(bot, err) {
 	start_rtm();
 });
 
-if (util.isProduction(ENVIRONMENT)) {
+if (util.isProduction(ENVIRONMENT) || util.isTest(ENVIRONMENT)) {
 	start_rtm();
+} else {
+	logger.info(`RTM hasn't started.`);
 }
+
+/*--------
+Cron
+--------*/
+cron.schedule('59 23 * * ' + config.get('schedule').days, function() {
+	cleanDeletedUsers();
+	db.resetCoins();
+},{
+	scheduled: true,
+	timezone: config.get('timezone')
+});
 
 /*--------
 Ping
