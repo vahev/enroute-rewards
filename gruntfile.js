@@ -98,11 +98,13 @@ module.exports = function(grunt) {
 						nodemon.on('log', function(event) {
 							grunt.log.writeln(event.colour);
 						});
-						nodemon.on('config:update', function () {
-							setTimeout(function() {
-								require('open')(config.https + config.host);
-							}, 4000);
-						});
+						if (config.open) {
+							nodemon.on('config:update', function () {
+								setTimeout(function() {
+									require('open')(config.https + config.host);
+								}, 4000);
+							});
+						}
 					},
 					cwd: __dirname,
 					ignore: ['gruntfile.js', 'source/**', 'public/**']

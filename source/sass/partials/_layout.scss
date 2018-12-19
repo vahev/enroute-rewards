@@ -54,6 +54,10 @@
 		@extend .flex;
 		flex: 1;
 	}
+	&-column {
+		@extend .flex;
+		flex-direction: column;
+	}
 	&-row {
 		@extend .flex;
 		flex-direction: row;

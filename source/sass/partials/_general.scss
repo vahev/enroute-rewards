@@ -4,6 +4,18 @@ body {
 	font-family: $font-family-source-sans;
 	background-color: $color-white;
 	-webkit-font-smoothing: antialiased;
+	display: flex;
+	flex-direction: column;
+	> #content {
+		display: flex;
+		flex-direction: column;
+		flex: 1;
+		// > .content + section {
+		// 	display: flex;
+		// 	flex-direction: column;
+		// 	flex: 1;
+		// }
+	}
 }
 
 h1, h2, h3, h4, h5, h6 {

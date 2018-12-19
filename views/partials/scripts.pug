@@ -1,6 +1,7 @@
-if config.local.ENVIRONMENT === "test"
+if (config.local.ENVIRONMENT === "test")
 	script(src="https://www.gstatic.com/firebasejs/5.7.0/firebase.js")
 else
+	script(src="https://www.gstatic.com/firebasejs/5.0.0/firebase-app.js")
 	script(src="https://www.gstatic.com/firebasejs/5.0.0/firebase-storage.js")
 script(src="/js/lib.min.js")
 if config.local.ENVIRONMENT === "test"

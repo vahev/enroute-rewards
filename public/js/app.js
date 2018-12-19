@@ -9,7 +9,11 @@ const emoji = new EmojiConvertor();
 
 app.filter("emojis", function() {
 	return function(input) {
-		return emoji.replace_colons(input);
+		const emojiReplace = emoji.replace_colons(input);
+		if (emojiReplace !== input) {
+			return emojiReplace;
+		}
+		return "";
 	};
 });
 
@@ -25,6 +29,35 @@ if (window.location.hostname === 'rewards.io'){
 	livereload.setAttribute('src','http://127.0.0.1:' + port + '/livereload.js');
 	document.head.appendChild(livereload);
 }
+
+app.controller('LeaderboardController', [
+	'$scope', '$log', 'leaderboardService', 'configService',
+	($scope, $log, $leaderboard, $config) => {
+		const images = ['image_1024', 'image_512', 'image_original'];
+
+		$scope.config = $config;
+		$scope.fetchLeaderboard = () => {
+			$leaderboard.getValid().then((leaderboard) => {
+				$scope.leaderboard = leaderboard.data;
+			});
+		};
+
+
+		$scope.hasImage = (user) => Object.keys(user).some((key) => images.indexOf(key) > 0);
+
+		$scope.getImage = (user) => {
+			let image = '';
+			images.forEach((key) => {
+				if (typeof user[key] !== 'undefined') {
+					image = user[key];
+				}
+			});
+			return image;
+		};
+
+		$scope.fetchLeaderboard();
+	}
+]);
 
 app.controller('RewardsController', [
 	'$scope', '$log', 'rewardsService',
@@ -256,15 +289,25 @@ app.directive('uploadFile', () => ({
 /*eslint no-undef: "off"*/
 app.factory('configService', [() => ({"title":"Enroute Rewards","keyword":{"token":":taco:","singular":"taco","plural":"tacos"}})]);
 
-const ENDPOINT = '/rewards/';
+const LEADERBOARD_ENDPOINT = '/leaderboard/';
 
+
+app.factory('leaderboardService', [
+	'$log', '$http', ($log, $http) => ({
+			get: (id) => $http.get(`${LEADERBOARD_ENDPOINT}/${id}`),
+			getAll: () => $http.get(`${LEADERBOARD_ENDPOINT}all`),
+			getValid: () => $http.get(`${LEADERBOARD_ENDPOINT}valid`)
+		})
+]);
+
+const REWARDS_ENDPOINT = '/rewards/';
 
 app.factory('rewardsService', [
 	'$log', '$http', ($log, $http) => ({
-			get: (id) => $http.get(`${ENDPOINT}/${id}`),
-			getAll: () => $http.get(`${ENDPOINT}all`),
+			get: (id) => $http.get(`${REWARDS_ENDPOINT}/${id}`),
+			getAll: () => $http.get(`${REWARDS_ENDPOINT}all`),
 			getImageUrl: (url) => firebase.storage().ref().child(url).getDownloadURL(),
-			remove: (key) => $http.delete(`${ENDPOINT}delete/${key}`),
+			remove: (key) => $http.delete(`${REWARDS_ENDPOINT}delete/${key}`),
 			reward: (args) => {
 				function Reward(args){
 					Object.assign(this, args);
@@ -283,14 +326,14 @@ app.factory('rewardsService', [
 						ref.put(reward.image)
 							.then(() => {
 								reward.image = fileName;
-								resolve($http.post(`${ENDPOINT}update`, reward));
+								resolve($http.post(`${REWARDS_ENDPOINT}update`, reward));
 							})
 							.catch((err) => {
 								reject(err);
 							});
 					});
 				}
-				return $http.post(`${ENDPOINT}update`, reward);
+				return $http.post(`${REWARDS_ENDPOINT}update`, reward);
 			}
 		})
 ]);

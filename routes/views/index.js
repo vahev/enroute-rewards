@@ -1,7 +1,8 @@
 var express = require('express'),
 		router = new express.Router(),
 		// logger = require(`${base_path}/logger`)('routes/views'),
-		config = require(`${base_path}/config`);
+		config = require(`${base_path}/config`),
+		db = require(`${base_path}/db`);
 
 function isAuthenticated(req, res, next) {
 	if (req.isAuthenticated()) {
@@ -39,8 +40,9 @@ async function showLeaderboard(req, res) {
 			app: await config.getApp(),
 			local: await config.getAll()
 		},
+		leaderboard: await db.getUsers(),
 		user: {
-			isAdmin: config.isAdmin(req.user)
+			isAdmin: (req.user) ? config.isAdmin(req.user) : false
 		},
 		view: {
 			title: 'Leaderboard',
@@ -49,11 +51,11 @@ async function showLeaderboard(req, res) {
 	});
 }
 
-router.get('/', isAuthenticated, async (req, res) => {
-	if (config.isAdmin(req.user)) {
-		await showConfiguration(req, res);
+router.get('/', (req, res) => {
+	if (req.isAuthenticated() && config.isAdmin(req.user)) {
+		res.redirect('/configuration/');
 	} else {
-		await showLeaderboard(req, res);
+		res.redirect('/leaderboard/');
 	}
 });
 
@@ -65,8 +67,27 @@ router.get('/configuration/', isAuthenticated, async (req, res) => {
 	}
 });
 
-router.get('/leaderboard/', isAuthenticated, async (req, res) => {
+router.get('/leaderboard/', async (req, res) => {
 	await showLeaderboard(req, res);
+});
+
+router.get('/about/', async (req, res) => {
+	res.render('about', {
+		app: {
+			title: config.get('title')
+		},
+		config: {
+			app: await config.getApp(),
+			local: await config.getAll()
+		},
+		user: {
+			isAdmin: (req.user) ? config.isAdmin(req.user) : false
+		},
+		view: {
+			title: 'About',
+			url: 'about'
+		}
+	});
 });
 
 router.get('/logout/', function(req, res) {
