@@ -51,6 +51,45 @@ async function showLeaderboard(req, res) {
 	});
 }
 
+async function showAbout(req, res) {
+	res.render('about', {
+		app: {
+			title: config.get('title')
+		},
+		config: {
+			app: await config.getApp(),
+			local: await config.getAll()
+		},
+		user: {
+			isAdmin: (req.user) ? config.isAdmin(req.user) : false
+		},
+		view: {
+			title: 'Thank You',
+			url: 'about'
+		}
+	});
+}
+
+async function showRewards(req, res) {
+	res.render('rewards', {
+		app: {
+			title: config.get('title')
+		},
+		config: {
+			app: await config.getApp(),
+			local: await config.getAll(),
+			rewards: await config.getRewards()
+		},
+		user: {
+			isAdmin: config.isAdmin(req.user),
+		},
+		view: {
+			title: 'Rewards',
+			url: 'rewards'
+		}
+	});
+}
+
 router.get('/', (req, res) => {
 	if (req.isAuthenticated() && config.isAdmin(req.user)) {
 		res.redirect('/configuration/');
@@ -72,22 +111,11 @@ router.get('/leaderboard/', async (req, res) => {
 });
 
 router.get('/about/', async (req, res) => {
-	res.render('about', {
-		app: {
-			title: config.get('title')
-		},
-		config: {
-			app: await config.getApp(),
-			local: await config.getAll()
-		},
-		user: {
-			isAdmin: (req.user) ? config.isAdmin(req.user) : false
-		},
-		view: {
-			title: 'About',
-			url: 'about'
-		}
-	});
+	await showAbout(req, res);
+});
+
+router.get('/rewards/', isAuthenticated, async (req, res) => {
+	await showRewards(req, res);
 });
 
 router.get('/logout/', function(req, res) {

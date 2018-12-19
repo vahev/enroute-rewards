@@ -12,6 +12,6 @@ block content
 								|)
 					div.flex-row-wrap
 						div.col.col-3(ng-repeat="(key, reward) in rewards")
-							reward-card(reward="reward" key="key" on-remove="fetchRewards()")
+							reward-card(reward="reward" key="key" is-admin on-remove="fetchRewards()")
 						div.col.col-3
-							reward-card(ng-if="newReward" reward="newReward" is-new="true" on-new="fetchRewards()")
+							reward-card(ng-if="newReward" reward="newReward" is-admin is-new="true" on-new="fetchRewards()")

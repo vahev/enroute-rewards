@@ -1,0 +1,17 @@
+extends layout
+
+block content
+	section
+		div.content.container
+			div.flex-row-align-center
+				div.col-8
+					h2.col-5.col-padding-0.home-extract
+						- var emoji = `<span class="emoji" ng-bind-html="('`+config.local.keyword.token+`'|emojis)"></span>`;
+						span Redeem your !{emoji} for any of the rewards we have for you.
+	section.background-grey(ng-controller="RewardsController")
+		div.content.container
+			div.flex-row-align-center.no-padding
+				div.col-9.rewards
+					div.flex-row-wrap
+						div.col.col-3(ng-repeat="(key, reward) in rewards")
+							reward-card(reward="reward" key="key")

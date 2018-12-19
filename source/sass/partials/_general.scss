@@ -45,11 +45,20 @@ code, kbd, pre, samp {
 	font-family: Menlo,Monaco,Consolas,"Courier New",monospace;
 }
 
+.home-extract {
+	font-size: 1.5em;
+	line-height: 1.22em;
+	margin: 0 0 54px 0;
+	font-weight: lighter;
+	font-family: $font-family-text;
+}
+
 .highlight-title {
-	font-family: $font-family-walsheim;
+	font-family: $font-family-headers;
 	font-weight: bold;
-	color: $color-dark;
+	color: $color-title-foreground;
 	font-size: 2.25em;
+	margin-top: 0;
 	margin-bottom: .6em;
 	line-height: 1.15em;
 	span {
@@ -61,7 +70,7 @@ code, kbd, pre, samp {
 			left: -2px;
 			width: 100%;
 			height: 100%;
-			background-color: $color-yellow;
+			background-color: $color-title-background;
 			padding: 0px 2px;
 			z-index: -1;
 			box-sizing: content-box;
@@ -100,7 +109,7 @@ code, kbd, pre, samp {
 }
 
 .background-grey {
-	padding: 120px 0;
+	padding: 60px 0;
 	background-color: $color-gray-ligther;
 }
 
@@ -181,6 +190,11 @@ code, kbd, pre, samp {
 	}
 	&.border-radius {
 		border-radius: .5em;
+	}
+	&[disabled] {
+		cursor: default;
+		color: $color-gray;
+		background-color: $color-gray-ligth;
 	}
 }
 

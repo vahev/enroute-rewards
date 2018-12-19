@@ -1,10 +1,9 @@
 extends layout
 block content
-	section.background-grey.flex-column.flex-1
-			div.flex-row-align-center.no-padding
-				div.content.container
-					div.flex-row
-						div.col.col-offset-4.col-4
-							- var emoji = `<span class="emoji" ng-bind-html="'` + config.local.keyword.token + `'|emojis"></span>`;
-							h1 Thank you
-							p So many !{emoji} to share, all the errors and bugs that you found are really valuable to the development team.<br/><br/>That’s all folks! and get ready for next features 🔥
+	section
+		div.content.container
+			div.flex-row-align-center
+				div.col-8
+					- var emoji = config.local.keyword.plural;
+					h2.col-5.col-padding-0.home-extract So many !{emoji} to share, all the errors and bugs that you see are really valuable to the development team.<br/><br/>That’s all folks! and get ready for next features 🔥
+					

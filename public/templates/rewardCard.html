@@ -1,4 +1,4 @@
-<div class="card card-less-padding" ng-class="{'updating': updating, 'uploading': uploading}">
+<div ng-if="isAdmin" class="card card-less-padding" ng-class="{'updating': updating, 'uploading': uploading}">
 	<div class="card--updating">
 		<div class="overlay"></div>
 		<div class="dots">
@@ -41,7 +41,7 @@
 			</span>
 			<p class="input placeholder" ng-if="!updating && !reward.price">Price for the review in {{config.keyword.plural}}</p>
 		</div>
-		<div class="flex-row input-area">
+		<div class="flex-row input-area input-area-textarea">
 			<strong class="name">Detail:</strong>
 			<textarea ng-if="updating" ng-model="reward.detail" class="input" name="detail" placeholder="Detail about the reward."></textarea>
 			<p class="input" ng-if="!updating && reward.detail" ng-bind="reward.detail"></p>
@@ -57,5 +57,28 @@
 			<a ng-if="!btnMessage" class="btn btn-blue" ng-click="save()">Save</a>
 			<a ng-if="btnMessage" ng-bind="btnMessage" class="btn btn-blue" ng-click="save()"></a>
 		</div>
+	</div>
+</div>
+<div ng-if="!isAdmin" class="card card-less-padding" ng-class="{'updating': updating, 'uploading': uploading}">
+	<div class="card--updating">
+		<div class="overlay"></div>
+		<div class="dots">
+			<div class="dot dot-1"></div><div class="dot dot-2"></div><div class="dot dot-3"></div>
+		</div>
+	</div>
+	<div class="card--image" ng-if="reward.image">
+		<storage-image ng-if="imageURL && imageLoaded" url="reward.image"></storage-image>
+	</div>
+	<div class="card--header">
+		<h4 class="flex-row-between">
+			<span class="card--name" ng-if="!updating && reward.name" ng-bind="reward.name"></span>
+			<span class="card--price" ng-bind="reward.price | number"></span>
+		</h4>
+	</div>
+	<div class="card--excerpt">
+		<p class="detail" ng-bind="reward.detail" ng-if="reward.detail"></p>
+	</div>
+	<div class="card--footer flex-row-align-end footer-show" ng-class="{'footer-show': (!isNew && updating) || (isNew && updating && hasChanged())}">
+		<a class="btn btn-blue" ng-click="redeem()" disabled>Redeem</a>
 	</div>
 </div>

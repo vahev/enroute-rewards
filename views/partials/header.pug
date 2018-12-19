@@ -9,8 +9,14 @@ header#header
 					ul#main-menu.site-menu.flex-row-between.flex-row-sm-col.flex-row-sm-between
 						li.menu-item(class={ 'current-menu-item': view.url == 'leaderboard' })
 							a(href="/leaderboard/") Leaderboard
-						li.menu-item(class={ 'current-menu-item': view.url == 'configuration' })
-							a(href="/configuration/") Configuration
+						if (user.isAdmin)
+							li.menu-item(class={ 'current-menu-item': view.url == 'rewards' })
+								a(href="/rewards/") Rewards
+							li.menu-item(class={ 'current-menu-item': view.url == 'configuration' })
+								a(href="/configuration/") Configuration
+						else
+							li.menu-item(class={ 'current-menu-item': view.url == 'rewards' })
+								a(href="/rewards/") Rewards
 						li.menu-item(class={ 'current-menu-item': view.url == 'about' })
 							a(href="/about/") About
 						if (user.isAdmin)

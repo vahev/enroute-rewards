@@ -1,0 +1,8 @@
+.rewards {
+	.grid {
+		display: grid;
+		grid-template-columns: auto auto auto;
+		grid-template-rows: 396px;
+		grid-auto-flow: dense;
+	}
+}
