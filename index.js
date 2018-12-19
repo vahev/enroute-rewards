@@ -295,7 +295,7 @@ Cron
 --------*/
 cron.schedule('59 23 * * ' + config.get('schedule').days, function() {
 	cleanDeletedUsers();
-	db.resetCoins();
+	db.reset();
 },{
 	scheduled: true,
 	timezone: config.get('timezone')
