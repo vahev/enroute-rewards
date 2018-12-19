@@ -405,6 +405,10 @@ textarea {
   height: 100%;
   fill: #128EFF; }
 
+.emoji {
+  max-width: 1.4em;
+  max-height: 1.4em; }
+
 header#header {
   padding: 24px 10px;
   margin-bottom: 1em;
@@ -848,8 +852,6 @@ header#header {
     position: relative;
     top: 2px;
     margin-left: .1em; }
-    .leaderboard .name .emoji:empty {
-      display: none; }
   .leaderboard .total {
     font-family: "Source Sans Pro", sans-serif;
     font-weight: normal;

@@ -1,8 +1,8 @@
 app.controller('LeaderboardController', [
-	'$scope', '$log', 'leaderboardService', 'configService',
-	($scope, $log, $leaderboard, $config) => {
+	'$scope', '$log', 'leaderboardService', 'configService', 'emojiService',
+	($scope, $log, $leaderboard, $config, $emoji) => {
 		const images = ['image_1024', 'image_512', 'image_original'];
-
+		$scope.emoji = $emoji;
 		$scope.config = $config;
 		$scope.fetchLeaderboard = () => {
 			$leaderboard.getValid().then((leaderboard) => {

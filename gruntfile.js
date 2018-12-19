@@ -18,6 +18,7 @@ module.exports = function(grunt) {
 				dest: 'public/js/lib.min.js',
 				src: [
 					'bower_components/angular/angular.min.js',
+					'bower_components/angular-sanitize/angular-sanitize.js',
 					'source/js/lib/emoji.min.js'
 				]
 			},

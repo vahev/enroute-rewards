@@ -13,7 +13,7 @@ block content
 									span(ng-if="user.real_name" ng-bind="user.real_name")
 									span(ng-if="!user.real_name && user.name" ng-bind="user.name")
 									span(ng-if="!user.real_name && !user.name" ng-bind="user.id")
-									span.emoji(ng-if="user.status_emoji" ng-bind="(user.status_emoji|emojis)")
+									span.emoji(ng-bind-html="(user.status_emoji|emojis)")
 								span.total
 									span(ng-bind="user.total_coins|number")
-									span.emoji(ng-bind="(config.keyword.token|emojis)")
+									span.emoji(ng-bind-html="(config.keyword.token|emojis)")

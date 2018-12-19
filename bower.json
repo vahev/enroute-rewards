@@ -16,6 +16,7 @@
   ],
   "dependencies": {
     "angular": "angularjs#^1.7.5",
-    "emoji-js": "^0.3.0"
+    "emoji-js": "^0.3.0",
+    "angular-sanitize": "^1.7.5"
   }
 }

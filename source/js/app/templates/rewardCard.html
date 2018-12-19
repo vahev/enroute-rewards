@@ -29,7 +29,7 @@
 			<input ng-if="updating" ng-model="reward.price" class="input" type="number" name="price" placeholder="Price in {{config.keyword.plural}}">
 			<span class="input" ng-if="!updating && reward.price">
 				{{ reward.price | number }}
-				<span class="emoji" ng-bind="(config.keyword.token|emojis)"></span>
+				<span class="emoji" ng-bind-html="(config.keyword.token|emojis)"></span>
 			</span>
 			<p class="input placeholder" ng-if="!updating && !reward.price">Price for the review in {{config.keyword.plural}}</p>
 		</div>

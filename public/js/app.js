@@ -3,25 +3,33 @@
 // build: 19/12/2018
 
 firebase.initializeApp({"apiKey":"AIzaSyBebYtKOqOxENgVbTfiNhWAxh4cr_Vn7Ec","authDomain":"rewards-cee1a.firebaseapp.com","databaseURL":"https://rewards-cee1a.firebaseio.com","projectId":"rewards-cee1a","storageBucket":"rewards-cee1a.appspot.com","messagingSenderId":"376174432289"});
-const app = angular.module('rewards', []);
-
+const app = angular.module('rewards', ['ngSanitize']);
 const emoji = new EmojiConvertor();
+emoji.replace_mode = 'img';
 
-app.filter("emojis", function() {
-	return function(input) {
-		const emojiReplace = emoji.replace_colons(input);
-		if (emojiReplace !== input) {
-			return emojiReplace;
-		}
-		return "";
-	};
-});
+app.filter("emojis", [
+	'$sce', function($sce) {
+		return (input) => {
+			const emojiReplace = emoji.replace_colons(input);
+			if (emojiReplace !== input) {
+				return $sce.trustAsHtml(emojiReplace);
+			}
+			return "";
+		};
+	}
+]);
 
 app.filter("length", function() {
 	return function(input) {
 		return Object.keys(input || {}).length;
 	};
 });
+
+app.factory('emojiService', [
+	() => ({
+		replace_mode: emoji.replace_mode
+	})
+]);
 
 if (window.location.hostname === 'rewards.io'){
 	const port = '4201';
@@ -31,10 +39,10 @@ if (window.location.hostname === 'rewards.io'){
 }
 
 app.controller('LeaderboardController', [
-	'$scope', '$log', 'leaderboardService', 'configService',
-	($scope, $log, $leaderboard, $config) => {
+	'$scope', '$log', 'leaderboardService', 'configService', 'emojiService',
+	($scope, $log, $leaderboard, $config, $emoji) => {
 		const images = ['image_1024', 'image_512', 'image_original'];
-
+		$scope.emoji = $emoji;
 		$scope.config = $config;
 		$scope.fetchLeaderboard = () => {
 			$leaderboard.getValid().then((leaderboard) => {
@@ -60,8 +68,9 @@ app.controller('LeaderboardController', [
 ]);
 
 app.controller('RewardsController', [
-	'$scope', '$log', 'rewardsService',
-	($scope, $log, $rewards) => {
+	'$scope', '$log', 'rewardsService', 'emojiService',
+	($scope, $log, $rewards, $emoji) => {
+		$scope.emoji = $emoji;
 		$scope.fetchRewards = () => {
 			$scope.newReward = null;
 			$rewards.getAll().then((rewards) => {
