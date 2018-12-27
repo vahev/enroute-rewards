@@ -203,6 +203,12 @@ if (util.isProduction(ENVIRONMENT)) {
 	});
 }
 
+if (util.isProduction(ENVIRONMENT)) {
+	controller.hears(token, 'direct_message', function(bot, message) {
+		bot.reply(message, `You can't sent ${plural} through a direct message`);
+	});
+}
+
 /*--------
 Dashboard Listener
 --------*/
