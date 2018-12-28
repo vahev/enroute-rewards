@@ -1,6 +1,6 @@
 /*eslint no-unused-vars: "off"*/
 /*eslint no-undef: "off"*/
-// build: 19/12/2018
+// build: 28/12/2018
 
 firebase.initializeApp({"apiKey":"AIzaSyD56HX-gb6mtAgXy0Nby6rdrWLNuSIAXeE","authDomain":"jw-rewards.firebaseapp.com","databaseURL":"https://jw-rewards.firebaseio.com","projectId":"jw-rewards","storageBucket":"jw-rewards.appspot.com","messagingSenderId":"283231607374"});
 const app = angular.module('rewards', ['ngSanitize']);
