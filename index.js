@@ -255,6 +255,7 @@ if (util.isProduction(ENVIRONMENT) || util.isTest(ENVIRONMENT)) {
 	});
 }
 
+console.log(`https://slack.com/api/users.list?token=${config.get('token')}&include_locale=true&pretty=1`)
 function cleanDeletedUsers() {
 	request(`https://slack.com/api/users.list?token=${config.get('token')}&include_locale=true&pretty=1`, (error, response, body) => {
 		if (error) {
@@ -300,8 +301,8 @@ if (util.isProduction(ENVIRONMENT) || util.isTest(ENVIRONMENT)) {
 Cron
 --------*/
 cron.schedule('59 23 * * ' + config.get('schedule').days, function() {
-	cleanDeletedUsers();
 	db.reset();
+	cleanDeletedUsers();
 },{
 	scheduled: true,
 	timezone: config.get('timezone')
