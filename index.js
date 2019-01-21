@@ -9,6 +9,7 @@ var util = require('./util'),
 		cron	 = require('node-cron'),
 		https	 = require('https'),
 		http	 = require('http'),
+		request  = require('request'),
 		db		 = require('./db'),
 		config = require('./config'),
 		controller = Botkit.slackbot({
@@ -255,7 +256,6 @@ if (util.isProduction(ENVIRONMENT) || util.isTest(ENVIRONMENT)) {
 	});
 }
 
-console.log(`https://slack.com/api/users.list?token=${config.get('token')}&include_locale=true&pretty=1`)
 function cleanDeletedUsers() {
 	request(`https://slack.com/api/users.list?token=${config.get('token')}&include_locale=true&pretty=1`, (error, response, body) => {
 		if (error) {
@@ -266,7 +266,7 @@ function cleanDeletedUsers() {
 			logger.info(response);
 			JSON.parse(body).members.forEach(function(member) {
 				if (member.deleted) {
-					db.deleteUser(member.id, member.name);
+					db.deleteUser(member.id);
 				}
 			});
 		}
