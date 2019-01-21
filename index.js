@@ -250,7 +250,7 @@ if (util.isProduction(ENVIRONMENT) || util.isTest(ENVIRONMENT)) {
 	controller.hears(`my ${plural}`, 'direct_message', function(bot, message) {
 		db.getUser(message.user)
 		.then((user) => {
-			bot.reply(message, `You have ${user.total_coins} ${plural}`);
+			bot.reply(message, `You have ${user.total_coins} ${plural} to redeem and today you can send ${user.coins} more ${plural}`);
 		});
 	});
 }
