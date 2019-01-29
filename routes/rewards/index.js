@@ -1,4 +1,4 @@
-// const logger = require('./../../logger')(__dirname);
+const logger = require('./../../logger')(__dirname);
 var express = require('express');
 
 var router = new express.Router(),
@@ -13,6 +13,13 @@ router.get('/all', async function (req, res) {
 router.post('/update', async function (req, res) {
 	const updated = await rewards.updateReward(req.body);
 	res.send(updated);
+});
+
+router.post('/redeem', function (req, res) {
+	logger(req.body);
+	logger(req.user);
+	// const updated = await rewards.updateReward(req.body);
+	res.send(true);
 });
 
 router.delete('/delete/:id', async function (req, res) {

@@ -25,19 +25,48 @@
 	</div>
 	<div class="card--excerpt">
 		<div class="flex-row input-area">
-			<strong class="name">Price:</strong>
-			<input ng-if="updating" ng-model="reward.price" class="input" type="number" name="price" placeholder="Price in {{config.keyword.plural}}">
-			<span class="input" ng-if="!updating && reward.price">
-				{{ reward.price | number }}
-				<span class="emoji" ng-bind-html="(config.keyword.token|emojis)"></span>
-			</span>
-			<p class="input placeholder" ng-if="!updating && !reward.price">Price for the review in {{config.keyword.plural}}</p>
+			<strong class="name"><label for="reward-price-{{reward.id}}">Price:</label></strong>
+			<div class="input">
+				<input id="reward-price-{{reward.id}}" ng-if="updating" ng-model="reward.price" type="number" name="price" placeholder="Price in {{config.keyword.plural}}">
+				<span ng-if="!updating && reward.price">
+					<span>{{ reward.price | number }}
+						<span class="emoji" ng-bind-html="(config.keyword.token|emojis)"></span>
+					</span>
+				</span>
+				<p ng-if="updating" class="help-text">Price in {{config.keyword.plural}}</p>
+				<p class="placeholder" ng-if="!updating && !reward.price">Price for the review in {{config.keyword.plural}}</p>
+			</div>
+		</div>
+		<div class="flex-row input-area input-areas">
+			<div class="flex-row-center input-area half">
+				<strong class="name"><label for="reward-stock-{{reward.id}}">In stock:</label></strong>
+				<div class="input">
+					<input id="reward-stock-{{reward.id}}" ng-if="updating" ng-model="reward.stock" type="number" name="stock">
+					<span ng-if="!updating" ng-bind="reward.stock"></span>
+				</div>
+			</div>
+			<div class="flex-row-center input-area half">
+				<strong class="name"><label for="reward-unique-{{reward.id}}">Unique:</label></strong>
+				<div class="input">
+					<input id="reward-unique-{{reward.id}}" ng-if="updating" ng-model="reward.unique" type="checkbox" name="unique">
+					<span ng-if="!updating && reward.unique" class="icon icon-check"></span>
+					<span ng-if="!updating && !reward.unique">No</span>
+				</div>
+			</div>
 		</div>
 		<div class="flex-row input-area input-area-textarea">
-			<strong class="name">Detail:</strong>
-			<textarea ng-if="updating" ng-model="reward.detail" class="input" name="detail" placeholder="Detail about the reward."></textarea>
+			<strong class="name"><label for="reward-detail-{{reward.id}}">Detail:</label></strong>
+			<textarea id="reward-detail-{{reward.id}}" ng-if="updating" ng-model="reward.detail" class="input" name="detail" placeholder="Detail about the reward."></textarea>
 			<p class="input" ng-if="!updating && reward.detail" ng-bind="reward.detail"></p>
-			<p class="input placeholder" ng-if="!updating && !reward.detail">Add a detail for the review</p>
+			<p class="input placeholder" ng-if="!updating && !reward.detail">Add a detail for the reward</p>
+		</div>
+		<div class="flex-row input-area input-area-options">
+			<strong class="name"><label for="reward-options-{{reward.id}}">Options:</label></strong>
+			<reward-chips id="reward-options-{{reward.id}}" ng-if="updating" ng-model="reward.options" class="input" name="detail" placeholder="Options for this reward."></reward-chips>
+			<div class="input wrap" ng-if="!updating && reward.options">
+				<div class="chip" ng-repeat="chip in reward.options"><span ng-bind="chip"></span></div>
+			</div>
+			<p class="input placeholder" ng-if="!updating && !reward.options">No Options</p>
 		</div>
 	</div>
 	<div class="card--footer flex-row-align-end" ng-class="{'footer-show': (!isNew && updating) || (isNew && updating && hasChanged())}">
@@ -52,25 +81,35 @@
 	</div>
 </div>
 <div ng-if="!isAdmin" class="card card-less-padding" ng-class="{'updating': updating, 'uploading': uploading}">
-	<div class="card--updating">
-		<div class="overlay"></div>
-		<div class="dots">
-			<div class="dot dot-1"></div><div class="dot dot-2"></div><div class="dot dot-3"></div>
-		</div>
-	</div>
 	<div class="card--image" ng-if="reward.image">
 		<storage-image ng-if="imageURL && imageLoaded" url="reward.image"></storage-image>
 	</div>
 	<div class="card--header">
 		<h4 class="flex-row-between">
-			<span class="card--name" ng-if="!updating && reward.name" ng-bind="reward.name"></span>
+			<span class="card--name" ng-if="!updating && reward.name">
+				{{reward.name}}
+				<span ng-if="reward.unique" class="unique-text">*</span>
+			</span>
 			<span class="card--price" ng-bind="reward.price | number"></span>
 		</h4>
 	</div>
 	<div class="card--excerpt">
 		<p class="detail" ng-bind="reward.detail" ng-if="reward.detail"></p>
+		<div ng-if="show_options" class="options-container">
+			<reward-options ng-model="reward_options_selected[$index]" options="options" ng-repeat="options in reward_options_steps" ng-disabled="$index > 0 && !reward_options_selected[$index - 1]"></reward-options>
+		</div>
+		<p ng-if="reward.unique" class="help-text">*Only one per person</p>
 	</div>
 	<div class="card--footer flex-row-align-end footer-show" ng-class="{'footer-show': (!isNew && updating) || (isNew && updating && hasChanged())}">
-		<a class="btn btn-blue" ng-click="redeem()" disabled>Redeem</a>
+		<a class="btn btn-blue" ng-click="redeem()" ng-disabled="!available || choosing_options">
+			<span ng-if="!available">Not Available</span>
+			<span ng-if="available">
+				<span ng-if="!choosing_options">Redeem</span>
+				<span ng-if="choosing_options && show_options">
+					<span ng-if="!optionsSelected()">Choose between the options</span>
+					<span ng-if="optionsSelected()">Redeem</span>
+				</span>
+			</span>
+		</a>
 	</div>
 </div>

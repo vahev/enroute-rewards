@@ -1,0 +1,41 @@
+reward-chips {
+	.textarea {
+		display: flex;
+		flex: 1;
+		background: $color-gray-ligther;
+		flex-direction: row;
+		flex-wrap: wrap;
+		padding-top: 4px;
+		padding-right: 4px;
+		cursor: text;
+		input.selected-chip {
+			flex: auto;
+			background: $color-gray-ligther;
+			margin-right: -4px;
+			margin-bottom: 0px;
+			// flex: 1;
+		}
+	}
+}
+
+reward-chips, .input {
+	.chip {
+		font-size: .8em;
+		background-color: $color-blue;
+		padding: 1px 7px;
+		color: $color-white;
+		border-radius: 20px;
+		margin-bottom: 4px;
+		margin-left: 4px;
+		&.editable {
+			cursor: pointer;
+		}
+		.icon.icon-cross {
+			margin-left: 5px;
+			cursor: pointer;
+			&::after, &::before {
+				background-color: $color-white;
+			}
+		}
+	}
+}

@@ -1,4 +1,19 @@
 .rewards {
+	.input-areas {
+		.input-area + .input-area {
+			margin-top: 0;
+			margin-left: .5em;
+			.name {
+				min-width: auto;
+			}
+		}
+		.input {
+			flex: 1;
+		}
+		.half {
+			flex: 1;
+		}
+	}
 	.input-area {
 		& + .input-area {
 			margin-top: 1em;
@@ -6,11 +21,15 @@
 		.name {
 			flex: 1;
 			text-align: right;
+			min-width: 70px;
+			cursor: pointer;
+			label {
+				cursor: pointer;
+			}
 		}
 		.input {
 			flex: 3;
 			margin: 0em 0.3em .25em;
-			min-height: 1.5em;
 			.emoji {
 				position: relative;
 				margin-left: .25em;

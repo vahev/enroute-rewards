@@ -5,6 +5,10 @@ app.directive('rewardCard', () => ({
 				$scope.config = $config;
 				$scope.updating = false;
 				$scope.uploading = false;
+				$scope.choosing_options = false;
+				$scope.reward_options_steps = {};
+				$scope.reward_options_selected = [];
+				$scope.show_options = false;
 				$scope.isAdmin = typeof $element.attr('is-admin') !== 'undefined';
 
 				if (!$scope.reward || $scope.isNew) {
@@ -13,6 +17,8 @@ app.directive('rewardCard', () => ({
 					});
 					$scope.btnMessage = 'New';
 				}
+
+				$scope.available = (typeof $scope.reward.stock !== 'undefined') ? $scope.reward.stock > 0 : 0;
 
 				let originalReward = angular.copy($scope.reward);
 				if ($scope.reward.image) {
@@ -72,22 +78,31 @@ app.directive('rewardCard', () => ({
 
 				// $log.log(Object.keys(originalReward));
 
-				const rewardsProperties = ['detail', 'image', 'name', 'price'];
+				const rewardsProperties = ['detail', 'image', 'name', 'price', 'unique', 'stock', 'options'];
 
 				$scope.changedProperties = () => rewardsProperties
-						.filter((key) => typeof rewardsProperties[key] === 'undefined' && typeof $scope.reward[key] !== 'undefined')
-						.filter((key) => originalReward[key] !== $scope.reward[key])
-						.filter((key) => {
-							// if (typeof $scope.reward[key] === 'string') {
-							// 	return $scope.reward[key].trim().length > 0;
-							// }
-							if (typeof $scope.reward[key] === 'object') {
-								return $scope.reward[key] !== null;
+					.filter((key) => typeof rewardsProperties[key] === 'undefined' && typeof $scope.reward[key] !== 'undefined')
+					.filter((key) => originalReward[key] !== $scope.reward[key])
+					.filter((key) => {
+						if (typeof $scope.reward[key] === 'object') {
+							if (typeof originalReward[key] === 'undefined' && typeof $scope.reward[key] === 'undefined') {
+								return false;
 							}
-							return true;
-						});
+							return JSON.stringify(originalReward[key]) !== JSON.stringify($scope.reward[key]);
+						}
+						return true;
+					});
 
 				$scope.hasChanged = () => $scope.changedProperties().length > 0;
+				// $scope.hasChanged = () => {
+				// 	if ($scope.changedProperties().length > 0) {
+				// 		console.log($scope.changedProperties());
+				// 		$scope.changedProperties().forEach((key) => {
+				// 			console.log(originalReward[key], $scope.reward[key]);
+				// 		});
+				// 	}
+				// 	return $scope.changedProperties().length > 0;
+				// };
 
 				$scope.$watch(() => $scope.reward.image, (newValue, oldValue) => {
 					if ((typeof newValue !== 'undefined' && newValue !== null) && (typeof oldValue === 'undefined' || oldValue === null)) {
@@ -97,6 +112,66 @@ app.directive('rewardCard', () => ({
 						$scope.cancel();
 					}
 				});
+
+				$scope.showOptions = () => {
+					let result = {};
+					Object.values($scope.reward.options).forEach((option) => {
+						if (option.match(/^(\d+):([\s\S]+)/g)) {
+							var c = (/^(\d+):([\s\S]+)$/g).exec(option);
+							if (typeof result[c[1]] === 'undefined') {
+								result[c[1]] = [];
+							}
+							result[c[1]].push(c[2]);
+						} else {
+							if (!Array.isArray(result)) {
+								result = [];
+							}
+							result.push(option);
+						}
+					});
+					if (!Array.isArray(result)) {
+						$scope.reward_options_steps = Object.values(result);
+					} else {
+						$scope.reward_options_steps = [result];
+					}
+					$scope.reward_options_selected = [];
+					$scope.show_options = true;
+				};
+
+				// $scope.optionsSelected = () => {
+				// 	console.log($scope.reward_options_selected.length >= $scope.reward_options_steps.length);
+				// 	return $scope.reward_options_selected.length >= $scope.reward_options_steps.length;
+				// };
+
+				$scope.optionsSelected = () => {
+					if ($scope.reward_options_selected.length >= $scope.reward_options_steps.length) {
+						$scope.choosing_options = false;
+					}
+					return $scope.reward_options_selected.length >= $scope.reward_options_steps.length;
+				};
+
+				$scope.redeem = () => {
+					if ($scope.reward.options) {
+						if (!$scope.choosing_options) {
+							$scope.choosing_options = true;
+							$scope.showOptions();
+						} else if ($scope.optionsSelected()) {
+							$scope.choosing_options = false;
+							$scope.reward.options = $scope.reward_options_selected;
+							$scope.redeemReward();
+						}
+					} else {
+						$scope.redeemReward();
+					}
+				};
+
+				$scope.redeemReward = () => {
+					$scope.updating = true;
+					$rewards.redeem($scope.reward)
+						.finally(() => {
+							$scope.cancel();
+						});
+				};
 
 				// $log.log($scope.reward);
 			}

@@ -6,7 +6,7 @@ const firebase = require('firebase');
 module.exports = {
 	deleteReward: (id) => firebase.database().ref(`rewards/${id}`).set(null),
 	updateReward: (reward) => {
-		const valueKeys = ['detail', 'image', 'name', 'price'];
+		const valueKeys = ['detail', 'image', 'name', 'price', 'unique', 'stock', 'options'];
 		const valueUpdate = {};
 		valueKeys.forEach((key) => {
 			if (reward[key]) {

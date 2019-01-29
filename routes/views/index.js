@@ -21,6 +21,7 @@ async function showConfiguration(req, res) {
 			local: await config.getAll(),
 			rewards: await config.getRewards()
 		},
+		pending: await db.getPendingRewards(),
 		user: {
 			isAdmin: config.isAdmin(req.user)
 		},

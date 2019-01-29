@@ -1,0 +1,4 @@
+<div class="textarea" ng-click="textAreaClick()">
+	<div class="chip editable" ng-repeat="chip in chips"><span ng-bind="chip"></span><i ng-click="deleteChip(chip, $event)" class="icon icon-cross"></i></div>
+	<input class="selected-chip" type="text" name="" ng-model="selectedChip" ng-keydown="keydown($event)">
+</div>

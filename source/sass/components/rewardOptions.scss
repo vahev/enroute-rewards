@@ -1,0 +1,42 @@
+reward-options {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	& + reward-options {
+		margin-top: .5em;
+	}
+	&[disabled] {
+		pointer-events: none;
+		.option {
+			border-color:  $color-gray-ligth;
+			color: $color-gray-ligth;
+			cursor: default;
+		}
+	}
+	.option {
+		padding: 0 4px;
+		background-color: $color-white;
+		color: $color-blue;
+		border: 1px solid $color-blue;
+		display: flex;
+		flex: 1;
+		justify-content: center;
+		cursor: pointer;
+		& + .option {
+			border-left: 0;
+		}
+		&:last-child {
+			border-radius: 0px 4px 4px 0px;
+		}
+		&:first-child {
+			border-radius: 4px 0px 0px 4px;
+		}
+		&:first-child:last-child {
+			border-radius: 4px;
+		}
+		&.active {
+			background-color: $color-blue;
+			color: $color-white;
+		}
+	}
+}

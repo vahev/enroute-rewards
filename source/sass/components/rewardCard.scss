@@ -1,13 +1,9 @@
 reward-card {
 	margin-bottom: 48px;
 	.card {
-		min-height: 400px;
-		max-height: 400px;
 		display: flex;
 		flex-direction: column;
 		&.updating {
-			min-height: 500px;
-			max-height: 500px;
 		}
 	}
 	.card--image {
@@ -101,9 +97,10 @@ reward-card {
 	.card--footer {
 		height: 0;
 		overflow: hidden;
-		transition: height .25s ease-out;
-		margin-top: 1em;
+		transition: all .4s ease-out;
+		margin-top: 0em;
 		&.footer-show {
+			margin-top: 1em;
 			height: 3em;
 		}
 	}
@@ -135,9 +132,8 @@ reward-card {
 		overflow: hidden;
 		display: flex;
 		flex-direction: column;
-		flex: 1;
 		.detail {
-			font-size: 0.8em;
+			font-size: 0.95em;
 			font-style: italic;
 			max-height: 3.7em;
 			word-break: break-word;
@@ -145,20 +141,46 @@ reward-card {
 			text-overflow: ellipsis;
 			padding-right: 30px;
 		}
+		.help-text{
+			font-size: .8em;
+			font-style: italic;
+			font-weight: bold;
+			margin-top: .3em;
+		}
 		.input-area {
 			.name {
 				justify-content: flex-end;
 			}
 			.input {
+				display: flex;
+				flex-direction: row;
 				margin-bottom: 0;
+				position: relative;
+				input {
+					width: 100%;
+				}
+				.help-text{
+					position: absolute;
+					bottom: -1.4em;
+					left: 0;
+					width: 100%;
+					text-align: right;
+				}
+				&.wrap {
+					flex-wrap: wrap;
+				}
 			}
 			&.input-area-textarea {
-				flex: 1;
 				textarea {
 					height: 5em;
 					max-height: 7em;
 				}
 			}
+		}
+		.options-container {
+			display: flex;
+			flex-direction: column;
+			margin-top: 1em;
 		}
 	}
 }

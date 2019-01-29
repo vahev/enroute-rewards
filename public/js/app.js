@@ -1,6 +1,6 @@
 /*eslint no-unused-vars: "off"*/
 /*eslint no-undef: "off"*/
-// build: 19/12/2018
+// build: 28/01/2019
 
 firebase.initializeApp({"apiKey":"AIzaSyBebYtKOqOxENgVbTfiNhWAxh4cr_Vn7Ec","authDomain":"rewards-cee1a.firebaseapp.com","databaseURL":"https://rewards-cee1a.firebaseio.com","projectId":"rewards-cee1a","storageBucket":"rewards-cee1a.appspot.com","messagingSenderId":"376174432289"});
 const app = angular.module('rewards', ['ngSanitize']);
@@ -75,6 +75,9 @@ app.controller('RewardsController', [
 			$scope.newReward = null;
 			$rewards.getAll().then((rewards) => {
 				$scope.newReward = angular.copy($rewards.reward({name: 'New Reward'}));
+				Object.keys(rewards.data).forEach((key) => {
+					rewards.data[key].id = key;
+				});
 				$scope.rewards = rewards.data;
 			});
 		};
@@ -90,6 +93,10 @@ app.directive('rewardCard', () => ({
 				$scope.config = $config;
 				$scope.updating = false;
 				$scope.uploading = false;
+				$scope.choosing_options = false;
+				$scope.reward_options_steps = {};
+				$scope.reward_options_selected = [];
+				$scope.show_options = false;
 				$scope.isAdmin = typeof $element.attr('is-admin') !== 'undefined';
 
 				if (!$scope.reward || $scope.isNew) {
@@ -98,6 +105,8 @@ app.directive('rewardCard', () => ({
 					});
 					$scope.btnMessage = 'New';
 				}
+
+				$scope.available = (typeof $scope.reward.stock !== 'undefined') ? $scope.reward.stock > 0 : 0;
 
 				let originalReward = angular.copy($scope.reward);
 				if ($scope.reward.image) {
@@ -157,22 +166,31 @@ app.directive('rewardCard', () => ({
 
 				// $log.log(Object.keys(originalReward));
 
-				const rewardsProperties = ['detail', 'image', 'name', 'price'];
+				const rewardsProperties = ['detail', 'image', 'name', 'price', 'unique', 'stock', 'options'];
 
 				$scope.changedProperties = () => rewardsProperties
-						.filter((key) => typeof rewardsProperties[key] === 'undefined' && typeof $scope.reward[key] !== 'undefined')
-						.filter((key) => originalReward[key] !== $scope.reward[key])
-						.filter((key) => {
-							// if (typeof $scope.reward[key] === 'string') {
-							// 	return $scope.reward[key].trim().length > 0;
-							// }
-							if (typeof $scope.reward[key] === 'object') {
-								return $scope.reward[key] !== null;
+					.filter((key) => typeof rewardsProperties[key] === 'undefined' && typeof $scope.reward[key] !== 'undefined')
+					.filter((key) => originalReward[key] !== $scope.reward[key])
+					.filter((key) => {
+						if (typeof $scope.reward[key] === 'object') {
+							if (typeof originalReward[key] === 'undefined' && typeof $scope.reward[key] === 'undefined') {
+								return false;
 							}
-							return true;
-						});
+							return JSON.stringify(originalReward[key]) !== JSON.stringify($scope.reward[key]);
+						}
+						return true;
+					});
 
 				$scope.hasChanged = () => $scope.changedProperties().length > 0;
+				// $scope.hasChanged = () => {
+				// 	if ($scope.changedProperties().length > 0) {
+				// 		console.log($scope.changedProperties());
+				// 		$scope.changedProperties().forEach((key) => {
+				// 			console.log(originalReward[key], $scope.reward[key]);
+				// 		});
+				// 	}
+				// 	return $scope.changedProperties().length > 0;
+				// };
 
 				$scope.$watch(() => $scope.reward.image, (newValue, oldValue) => {
 					if ((typeof newValue !== 'undefined' && newValue !== null) && (typeof oldValue === 'undefined' || oldValue === null)) {
@@ -182,6 +200,66 @@ app.directive('rewardCard', () => ({
 						$scope.cancel();
 					}
 				});
+
+				$scope.showOptions = () => {
+					let result = {};
+					Object.values($scope.reward.options).forEach((option) => {
+						if (option.match(/^(\d+):([\s\S]+)/g)) {
+							var c = (/^(\d+):([\s\S]+)$/g).exec(option);
+							if (typeof result[c[1]] === 'undefined') {
+								result[c[1]] = [];
+							}
+							result[c[1]].push(c[2]);
+						} else {
+							if (!Array.isArray(result)) {
+								result = [];
+							}
+							result.push(option);
+						}
+					});
+					if (!Array.isArray(result)) {
+						$scope.reward_options_steps = Object.values(result);
+					} else {
+						$scope.reward_options_steps = [result];
+					}
+					$scope.reward_options_selected = [];
+					$scope.show_options = true;
+				};
+
+				// $scope.optionsSelected = () => {
+				// 	console.log($scope.reward_options_selected.length >= $scope.reward_options_steps.length);
+				// 	return $scope.reward_options_selected.length >= $scope.reward_options_steps.length;
+				// };
+
+				$scope.optionsSelected = () => {
+					if ($scope.reward_options_selected.length >= $scope.reward_options_steps.length) {
+						$scope.choosing_options = false;
+					}
+					return $scope.reward_options_selected.length >= $scope.reward_options_steps.length;
+				};
+
+				$scope.redeem = () => {
+					if ($scope.reward.options) {
+						if (!$scope.choosing_options) {
+							$scope.choosing_options = true;
+							$scope.showOptions();
+						} else if ($scope.optionsSelected()) {
+							$scope.choosing_options = false;
+							$scope.reward.options = $scope.reward_options_selected;
+							$scope.redeemReward();
+						}
+					} else {
+						$scope.redeemReward();
+					}
+				};
+
+				$scope.redeemReward = () => {
+					$scope.updating = true;
+					$rewards.redeem($scope.reward)
+						.finally(() => {
+							$scope.cancel();
+						});
+				};
 
 				// $log.log($scope.reward);
 			}
@@ -195,6 +273,86 @@ app.directive('rewardCard', () => ({
 			'reward': '=?'
 		},
 		templateUrl: '/templates/rewardCard.html'
+	})
+);
+
+app.directive('rewardChips', () => ({
+		controller: [
+			'$log', '$scope', '$element', 'configService',
+			($log, $scope, $element, $config) => {
+				$scope.config = $config;
+				$scope.unique = (typeof $scope.unique != 'undefined') ? $scope.unique : true;
+				const keysSeparators = ['Tab', 'Enter', ','];
+				const input = $element.find('input');
+				$scope.chips = (typeof $scope.ngModel != 'undefined') ? Object.values($scope.ngModel) : [];
+
+				$scope.addChip = () => {
+					$scope.chips.push($scope.selectedChip);
+					$scope.setValue();
+					$scope.selectedChip = "";
+				};
+
+				$scope.setValue = () => {
+					const result = {};
+					$scope.chips.forEach((chip, i) => {
+						result[i] = chip;
+					});
+					$scope.ngModel = result;
+				};
+
+				$scope.textAreaClick = () => {
+					input[0].focus();
+				};
+
+				$scope.deleteChip = (chip, $event) => {
+					$event.preventDefault();
+					$event.stopPropagation();
+					$scope.chips.splice($scope.chips.indexOf(chip), 1);
+					$scope.setValue();
+				};
+
+				$scope.keydown = ($event) => {
+					if (keysSeparators.indexOf($event.key) >= 0 && $scope.selectedChip.length) {
+						if ($scope.unique && $scope.chips.indexOf($scope.selectedChip) >= 0) {
+							return;
+						}
+						$event.preventDefault();
+						$event.stopPropagation();
+						$scope.addChip();
+					}
+				};
+
+			}
+		],
+		restrict: 'E',
+		scope: {
+			'ngModel': '=',
+			'unique': '@'
+		},
+		templateUrl: '/templates/rewardChips.html'
+	})
+);
+
+app.directive('rewardOptions', () => ({
+		controller: [
+			'$log', '$scope', '$element', 'configService',
+			($log, $scope, $element, $config) => {
+				$scope.config = $config;
+
+				$scope.selectOption = ($event, option) => {
+					const optionSelected = angular.element($event.target);
+					angular.element(optionSelected).parent().find('span').removeClass('active');
+					angular.element(optionSelected).addClass('active');
+					$scope.ngModel = option;
+				};
+			}
+		],
+		restrict: 'E',
+		scope: {
+			'ngModel': '=',
+			'options': '&'
+		},
+		templateUrl: '/templates/rewardOptions.html'
 	})
 );
 
@@ -310,14 +468,15 @@ app.factory('leaderboardService', [
 		})
 ]);
 
-const REWARDS_ENDPOINT = '/rewards/';
+const REWARDS_ENDPOINT = '/rewards';
 
 app.factory('rewardsService', [
 	'$log', '$http', ($log, $http) => ({
 			get: (id) => $http.get(`${REWARDS_ENDPOINT}/${id}`),
-			getAll: () => $http.get(`${REWARDS_ENDPOINT}all`),
+			getAll: () => $http.get(`${REWARDS_ENDPOINT}/all`),
 			getImageUrl: (url) => firebase.storage().ref().child(url).getDownloadURL(),
-			remove: (key) => $http.delete(`${REWARDS_ENDPOINT}delete/${key}`),
+			redeem: (reward) => $http.post(`${REWARDS_ENDPOINT}/redeem`, reward),
+			remove: (key) => $http.delete(`${REWARDS_ENDPOINT}/delete/${key}`),
 			reward: (args) => {
 				function Reward(args){
 					Object.assign(this, args);
@@ -336,14 +495,14 @@ app.factory('rewardsService', [
 						ref.put(reward.image)
 							.then(() => {
 								reward.image = fileName;
-								resolve($http.post(`${REWARDS_ENDPOINT}update`, reward));
+								resolve($http.post(`${REWARDS_ENDPOINT}/update`, reward));
 							})
 							.catch((err) => {
 								reject(err);
 							});
 					});
 				}
-				return $http.post(`${REWARDS_ENDPOINT}update`, reward);
+				return $http.post(`${REWARDS_ENDPOINT}/update`, reward);
 			}
 		})
 ]);

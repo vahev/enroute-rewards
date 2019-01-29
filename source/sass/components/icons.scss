@@ -1,0 +1,57 @@
+.icon {
+	width: 1em;
+	height: 1em;
+	display: inline-block;
+	position: relative;
+	&-check {
+		margin-left: 2px;
+		width: 12px;
+		height: 7px;
+		transform-origin: center;
+		transform: translateY(-2px) rotate(-45deg);
+		&::after,
+		&::before {
+			content: "";
+			display: block;
+			position: absolute;
+			background: $color-blue;
+			z-index: 2;
+		}
+		&::after {
+			top: 4px;
+			width: 12px;
+			height: 3px;
+		}
+		&::before {
+			width: 3px;
+			height: 7px;
+		}
+	}
+	&-cross {
+		margin-left: 2px;
+		width: 12px;
+		height: 12px;
+		transform-origin: center;
+		transform: translateY(1px) rotate(-45deg);
+		&::after,
+		&::before {
+			content: "";
+			display: block;
+			position: absolute;
+			background: $color-red;
+			z-index: 2;
+		}
+		&::after {
+			top: 50%;
+			transform: translateY(-50%);
+			width: 12px;
+			height: 3px;
+		}
+		&::before {
+			left: 50%;
+			transform: translateX(-50%);
+			width: 3px;
+			height: 12px;
+		}
+	}
+}

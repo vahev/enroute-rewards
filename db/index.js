@@ -54,6 +54,43 @@ function getUserTotalTokens(user) {
 	return firebase.database().ref('users/' + user + '/total_coins');
 }
 
+function setRedeem(user, reward) {
+	return new Promise(function(resolve, reject) {
+		const newRedeem = firebase.database().ref('redeems').push();
+		newRedeem.set({
+			creation: firebase.database.ServerValue.TIMESTAMP,
+			done: false,
+			reward,
+			update: firebase.database.ServerValue.TIMESTAMP,
+			user
+		})
+		.then((snapshot) => {
+			const redeems = snapshot.val();
+			const result = redeems.filter((redeem) => redeem.done);
+			resolve(result);
+		})
+		.catch((error) => reject(error));
+	});
+}
+
+function resolveRedeem(redeem) {
+	return firebase.database().ref(`redeems/${redeem}`).update({done: true});
+}
+
+function getPendingRewards() {
+	return new Promise(function(resolve, reject) {
+		firebase.database().ref('redeems').once('value')
+		.then((snapshot) => {
+			const redeems = snapshot.val() || {};
+			logger.info('redeems:');
+			logger.info(JSON.stringify(redeems));
+			const result = Object.keys(redeems).filter((key) => redeems[key].done);
+			resolve(result);
+		})
+		.catch((error) => reject(error));
+	});
+}
+
 function getUsers() {
 	return firebase.database().ref('users/').once('value');
 }
@@ -178,12 +215,15 @@ function reset() {
 }
 
 module.exports = {
+	getPendingRewards,
 	getUser,
 	getUserTokens,
 	getUsers,
 	getValidUsers,
 	reset,
+	resolveRedeem,
 	sendTokens,
 	setUserTimeOffset,
+	setRedeem,
 	updateUsersWithSlack
 };
