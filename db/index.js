@@ -177,6 +177,10 @@ function reset() {
 	});
 }
 
+function deleteUser(userId) {
+	firebase.database().ref('users/' + userId).remove();
+}
+
 module.exports = {
 	getUser,
 	getUserTokens,
@@ -185,5 +189,6 @@ module.exports = {
 	reset,
 	sendTokens,
 	setUserTimeOffset,
-	updateUsersWithSlack
+	updateUsersWithSlack,
+	deleteUser
 };

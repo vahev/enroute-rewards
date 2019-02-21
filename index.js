@@ -9,6 +9,7 @@ var util = require('./util'),
 		cron	 = require('node-cron'),
 		https	 = require('https'),
 		http	 = require('http'),
+		request  = require('request'),
 		db		 = require('./db'),
 		config = require('./config'),
 		controller = Botkit.slackbot({
@@ -250,7 +251,7 @@ if (util.isProduction(ENVIRONMENT) || util.isTest(ENVIRONMENT)) {
 	controller.hears(`my ${plural}`, 'direct_message', function(bot, message) {
 		db.getUser(message.user)
 		.then((user) => {
-			bot.reply(message, `You have ${user.total_coins} ${plural}`);
+			bot.reply(message, `You have ${user.total_coins} ${plural} to redeem and today you can send ${user.coins} more ${plural}`);
 		});
 	});
 }
@@ -265,7 +266,7 @@ function cleanDeletedUsers() {
 			logger.info(response);
 			JSON.parse(body).members.forEach(function(member) {
 				if (member.deleted) {
-					db.deleteUser(member.id, member.name);
+					db.deleteUser(member.id);
 				}
 			});
 		}
@@ -300,8 +301,8 @@ if (util.isProduction(ENVIRONMENT) || util.isTest(ENVIRONMENT)) {
 Cron
 --------*/
 cron.schedule('59 23 * * ' + config.get('schedule').days, function() {
-	cleanDeletedUsers();
 	db.reset();
+	cleanDeletedUsers();
 },{
 	scheduled: true,
 	timezone: config.get('timezone')
