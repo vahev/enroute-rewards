@@ -264,9 +264,10 @@ function cleanDeletedUsers() {
 		} else {
 			// Print the response status code if a response was received
 			logger.info(response);
-			JSON.parse(body).members.forEach(function(member) {
-				if (member.deleted) {
-					db.deleteUser(member.id);
+			var members = JSON.parse(body).members;
+			Object.keys(members).forEach(function(member) {
+				if (members[member].deleted) {
+					db.deleteUser(members[member].id);
 				}
 			});
 		}
