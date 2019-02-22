@@ -217,10 +217,10 @@ if (util.isProduction(ENVIRONMENT) || util.isTest(ENVIRONMENT)) {
 	controller.hears('show leaderboard', 'ambient', function(bot, message) {
 		let leaderboard = [];
 		db.getValidUsers()
-		.then(function(users) {
+			.then(function(users) {
 				leaderboard = users.slice(0,10);
 				const result = leaderboard
-					.map((user, index) => `${index+1}. <@${user.id}> : ${user.total_coins} ${plural}`)
+					.map((user, index) => `${index+1}. *${user.name || user.real_name}*: ${user.total_coins} ${plural}`)
 					.join('\n');
 				bot.reply(message, `===== Top 10 ===== \n ${result}`);
 			});
@@ -303,6 +303,7 @@ Cron
 --------*/
 cron.schedule('59 23 * * ' + config.get('schedule').days, function() {
 	db.reset();
+	db.updateUsersWithSlack();
 	cleanDeletedUsers();
 },{
 	scheduled: true,
