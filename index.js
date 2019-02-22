@@ -217,18 +217,12 @@ if (util.isProduction(ENVIRONMENT) || util.isTest(ENVIRONMENT)) {
 	controller.hears('show leaderboard', 'ambient', function(bot, message) {
 		let leaderboard = [];
 		db.getValidUsers()
-		.then(function(users) {
-				getUsers().then(function(slackUsers){
-					var usersById = {};
-					slackUsers.forEach(function(user) {
-						usersById[user.id] = user.profile.display_name || user.profile.real_name;
-					});
-					leaderboard = users.slice(0,10);
-					const result = leaderboard
-						.map((user, index) => `${index+1}. *${usersById[user.id]}*: ${user.total_coins} ${plural}`)
-						.join('\n');
-					bot.reply(message, `===== Top 10 ===== \n ${result}`);
-				});
+			.then(function(users) {
+				leaderboard = users.slice(0,10);
+				const result = leaderboard
+					.map((user, index) => `${index+1}. *${user.name || user.real_name}*: ${user.total_coins} ${plural}`)
+					.join('\n');
+				bot.reply(message, `===== Top 10 ===== \n ${result}`);
 			});
 	});
 }
@@ -279,22 +273,6 @@ function cleanDeletedUsers() {
 	});
 }
 
-function getUsers() {
-	return new Promise(function(resolve, reject) {
-		request(`https://slack.com/api/users.list?token=${config.get('token')}&include_locale=true&pretty=1`, (error, response, body) => {
-			if (error) {
-				// Print the error if one occurred
-				reject(error);
-			} else {
-				// Print the response status code if a response was received
-				logger.info(response);
-				resolve(JSON.parse(body).members);
-			}
-		});
-	}) ;
-	
-}
-
 /*--------
 Bot starts
 --------*/
@@ -324,6 +302,7 @@ Cron
 --------*/
 cron.schedule('59 23 * * ' + config.get('schedule').days, function() {
 	db.reset();
+	db.updateUsersWithSlack();
 	cleanDeletedUsers();
 },{
 	scheduled: true,
